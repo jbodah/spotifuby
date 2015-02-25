@@ -21,6 +21,12 @@ module Spotify
     run 'pause'
   end
 
+  def set_volume(to)
+    # Sanitize
+    Integer(to)
+    run "set sound volume to #{to}"
+  end
+
   private
 
   def run(command)
@@ -28,8 +34,13 @@ module Spotify
   end
 end
 
-Spotify.public_methods.each do |m|
-  get "/#{m}" do
-    Spotify.send(m)
+Spotify.public_methods.each do |sym|
+  get "/#{sym}" do
+    m = Spotify.public_method(sym)
+    call_params = m.parameters.reduce([]) do |memo, parameter|
+      name = parameter[1]
+      memo << params[name]
+    end
+    m.call(*call_params)
   end
 end
