@@ -19,3 +19,7 @@ curl localhost:4567/play
 
 The routes for Spotifuby is dynamically generated based on the
 methods provided by the `Spotify` module. See spotifuby.rb for details.
+
+# Thanks
+
+Big thanks to @hnarayanan for the shpotify repo
