@@ -29,9 +29,10 @@ module Spotify
   end
 
   def current_track
-    [:name, :artist, :album].map do |sym|
-      "#{sym.to_s.capitalize}: #{run "#{sym} of current track as string"}"
-    end.join(";\n")
+    [:name, :artist, :album].reduce({}) do |memo, sym|
+      memo[sym] = run "#{sym} of current track as string"
+      memo
+    end
   end
 
   private
@@ -47,16 +48,27 @@ spotify_methods = Spotify.public_methods.select {|m| Spotify.method(m).owner == 
 spotify_methods.each do |sym|
   method = Spotify.public_method(sym)
 
-  route = "/#{sym}"
-  get route do
+  action = Proc.new do |params|
     call_params = method.parameters.reduce([]) do |memo, parameter|
       name = parameter[1]
       memo << params[name]
     end
-    m.call(*call_params)
+    method.call(*call_params)
   end
 
-  discovery[route] = {
+  route = "/#{sym}"
+  json_route = "#{route}.json"
+
+  get route do
+    action.call(params)
+  end
+
+  get json_route do
+    res = action.call(params)
+    res.to_json if res
+  end
+
+  discovery[json_route] = {
     parameters: method.parameters.map do |parameter|
       { name: parameter[1], required: parameter[0] == :req }
     end
