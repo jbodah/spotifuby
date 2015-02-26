@@ -13,7 +13,7 @@ Spotifuby.
 ## Usage
 
 ```rb
-ruby spotifuby.rb
+rake start
 curl localhost:4567/play
 ```
 
