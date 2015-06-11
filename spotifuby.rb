@@ -3,6 +3,11 @@ require 'json'
 require_relative 'lib/spotify'
 require_relative 'lib/api'
 
+get '/' do
+  @current_track = Spotify.current_track
+  erb :index
+end
+
 @discovery = API::Discovery.new
 
 spotify_methods = Spotify.public_methods.select do |m|
@@ -17,6 +22,7 @@ spotify_methods.each do |sym|
   route = "/#{sym}"
   get route do
     api_method.call(params)
+    redirect back
   end
 
   # Create a JSON route

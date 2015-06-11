@@ -1,0 +1,34 @@
+<h1>Welcome to your Spotifuby server!</h1>
+
+<div>
+  <h2>What's playing?</h2>
+  <ul>
+    <li>Name: <%= @current_track[:name] %></li>
+    <li>Artist: <%= @current_track[:artist] %></li>
+    <li>Album: <%= @current_track[:album] %></li>
+  </ul>
+</div>
+
+<ul>
+  <li><a href='next'>Skip track</a></li>
+  <li><a href='previous'>Previous track</a></li>
+  <li><a href='pause'>Pause Spotify</a></li>
+  <li><a href='play'>Play Spotify</a></li>
+  <li>
+    <a id='set_volume' href='#'>Set volume %</a>
+    <input id='volume' type='text'/>
+  </li>
+</ul>
+
+<script src='http://code.jquery.com/jquery-2.1.4.min.js'></script>
+<script>
+  $(function () {
+    $('#set_volume').click(function () {
+      var volume = $('#volume').val();
+      if (volume.length == 0) {
+        volume = '0';
+      }
+      window.location = 'set_volume?to=' + volume;
+    });
+  });
+</script>
