@@ -8,7 +8,7 @@ module Spotify
     if uri.nil?
       run 'play'
     else
-      run "play track #{uri}"
+      run "play track \"#{uri}\""
     end
   end
 
@@ -25,8 +25,6 @@ module Spotify
   end
 
   def set_volume(to)
-    # Sanitize
-    Integer(to)
     run "set sound volume to #{to}"
   end
 
@@ -38,32 +36,20 @@ module Spotify
   end
 
   [:artist, :album, :track].each do |sym|
-    define_method "search_#{sym}" do |name|
+    define_method "search_#{sym}" do |q|
       authenticate
-      RSpotify.const_get(sym.capitalize).search(name)
+      RSpotify.const_get(sym.capitalize).search(q).map {|o| dto(o)}
     end
   end
 
   def albums_by_artist(id)
     authenticate
-    RSpotify::Artist.find(id).albums
+    RSpotify::Artist.find(id).albums.map {|a| dto(a)}
   end
 
-  def tracks_in_album(album_id)
+  def tracks_on_album(id)
     authenticate
-    RSpotify::Albums.find(id).tracks
-  end
-
-  # Might not be needed
-  def play_random_track_by_artist(id)
-    authenticate
-    play_random_track_on_album(albums_by_artist(id).sample.id)
-  end
-
-  # Might not be needed
-  def play_random_track_on_album(id)
-    authenticate
-    play tracks_in_album(id).sample.uri
+    RSpotify::Album.find(id).tracks.map {|t| dto(t)}
   end
 
   private
@@ -80,5 +66,12 @@ module Spotify
 
   def run(command)
     `osascript -e 'tell application \"Spotify\" to #{command}'`
+  end
+
+  def dto(obj)
+    # TODO cleanup
+    { name: obj.name, uri: obj.uri, id: obj.id }.tap do |x|
+      x.define_singleton_method :method_missing, -> (sym) { obj.public_send(sym) }
+    end
   end
 end

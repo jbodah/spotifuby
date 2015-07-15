@@ -3,37 +3,68 @@ require 'json'
 require_relative 'lib/spotify'
 require_relative 'lib/api'
 
+class HashProxy
+  def initialize(hash)
+    @hash = hash
+  end
+
+  def method_missing(sym)
+    @hash[sym.to_s]
+  end
+end
+
+before do
+  if @request.content_type == 'application/json' && @request.request_method == 'POST'
+    @data = HashProxy.new(JSON.parse(@request.body.read))
+  end
+end
+
+# Web root
 get '/' do
   @current_track = Spotify.current_track
   erb :index
 end
 
-@discovery = API::Discovery.new
-
-spotify_methods = Spotify.public_methods.select do |m|
-  Spotify.method(m).owner == Spotify
+post '/play.json' do
+  Spotify.play(@data.uri)
 end
 
-spotify_methods.each do |sym|
-  spotify_method = Spotify.public_method(sym)
-  api_method = API::Method.new(spotify_method)
-
-  # Create a normal route
-  route = "/#{sym}"
-  get route do
-    api_method.call(params)
-    redirect back
-  end
-
-  # Create a JSON route
-  json_route = "#{route}.json"
-  get json_route do
-    res = api_method.call(params)
-    res.to_json if res
-  end
-
-  # Collect JSON routes for a discovery endpoint
-  @discovery.add(json_route, spotify_method)
+post '/pause.json' do
+  Spotify.pause
 end
 
-@discovery.build_endpoint(self)
+post '/next.json' do
+  Spotify.next
+end
+
+post '/previous.json' do
+  Spotify.previous
+end
+
+post '/set_volume.json' do
+  Spotify.set_volume(Integer(@data.volume))
+end
+
+get '/current_track.json' do
+  Spotify.current_track.to_json
+end
+
+get '/search_artist.json' do
+  Spotify.search_artist(params[:q]).to_json
+end
+
+get '/search_album.json' do
+  Spotify.search_album(params[:q]).to_json
+end
+
+get '/search_track.json' do
+  Spotify.search_track(params[:q]).to_json
+end
+
+get '/albums_by_artist.json' do
+  Spotify.albums_by_artist(params[:id]).to_json
+end
+
+get '/tracks_on_album.json' do
+  Spotify.tracks_on_album(params[:id]).to_json
+end
