@@ -9,7 +9,7 @@ task :stop do
   puts "Stopping spotifuby server."
   begin
     `ps aux | grep spotifuby | grep -v grep | awk '{ print $2 }' | xargs kill`
-  rescue => SignalException
+  rescue SignalException
     # swallow
   end
 end
