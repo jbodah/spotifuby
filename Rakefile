@@ -13,3 +13,6 @@ task :stop do
     # swallow
   end
 end
+
+desc 'Restart public server'
+task :restart => [:stop, :start]
