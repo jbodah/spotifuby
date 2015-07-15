@@ -7,5 +7,5 @@ end
 desc 'Stop public server'
 task :stop do
   puts "Stopping spotifuby server."
-  `ps aux | grep spotifuby | grep -v grep | awk '{ print $2 }' | xargs kill`
+  system "ps aux | grep spotifuby | grep -v grep | awk '{ print $2 }' | xargs kill"
 end
