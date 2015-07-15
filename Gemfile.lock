@@ -1,19 +1,55 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    domain_name (0.5.24)
+      unf (>= 0.0.5, < 1.0.0)
+    faraday (0.9.1)
+      multipart-post (>= 1.2, < 3)
+    hashie (3.4.2)
+    http-cookie (1.0.2)
+      domain_name (~> 0.5)
+    jwt (1.5.1)
+    mime-types (2.6.1)
+    multi_json (1.11.2)
+    multi_xml (0.5.5)
+    multipart-post (2.0.0)
+    netrc (0.10.3)
+    oauth2 (1.0.0)
+      faraday (>= 0.8, < 0.10)
+      jwt (~> 1.0)
+      multi_json (~> 1.3)
+      multi_xml (~> 0.5)
+      rack (~> 1.2)
+    omniauth (1.2.2)
+      hashie (>= 1.2, < 4)
+      rack (~> 1.0)
+    omniauth-oauth2 (1.3.1)
+      oauth2 (~> 1.0)
+      omniauth (~> 1.2)
     rack (1.6.0)
     rack-protection (1.5.3)
       rack
     rake (10.4.2)
+    rest-client (1.8.0)
+      http-cookie (>= 1.0.2, < 2.0)
+      mime-types (>= 1.16, < 3.0)
+      netrc (~> 0.7)
+    rspotify (1.14.0)
+      omniauth-oauth2 (~> 1.1)
+      rest-client (~> 1.7)
     sinatra (1.4.5)
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
     tilt (1.4.1)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.7.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   rake
+  rspotify
   sinatra
