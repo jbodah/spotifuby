@@ -1,20 +1,22 @@
 require 'sinatra'
 require 'json'
 require_relative 'lib/spotify'
-require_relative 'lib/api'
+require_relative 'lib/hash_proxy'
+require_relative 'lib/spotify_song_event_watcher'
 
-class HashProxy
-  def initialize(hash)
-    @hash = hash
-  end
+Thread.abort_on_exception = true
 
-  def method_missing(sym)
-    @hash[sym.to_s]
-  end
-end
+logger = Logger.new($stdout)
+logger.level = Logger::INFO
+
+w = SpotifySongEventWatcher.new(Spotify, logger: logger)
+Thread.new { w.run }
+
+Spotify.logger = logger
 
 before do
-  if @request.content_type == 'application/json' && @request.request_method == 'POST'
+  if @request.content_type == 'application/json' &&
+     @request.request_method == 'POST'
     @data = HashProxy.new(JSON.parse(@request.body.read))
   end
 end
@@ -26,7 +28,9 @@ get '/' do
 end
 
 post '/play.json' do
-  Spotify.play(@data.uri)
+  Spotify.mutex.synchronize do
+    Spotify.play(@data.uri)
+  end
 end
 
 post '/pause.json' do
@@ -43,6 +47,22 @@ end
 
 post '/set_volume.json' do
   Spotify.set_volume(Integer(@data.volume))
+end
+
+post '/enqueue.json' do
+  priority = @data.priority
+  priority = priority.to_sym if priority
+  Spotify.enqueue_uri(priority, @data.uri)
+end
+
+post '/set_default_uri.json' do
+  Spotify.default_uri = @data.uri
+end
+
+post '/play_default_uri.json' do
+  Spotify.mutex.synchronize do
+    Spotify.play(Spotify.default_uri)
+  end
 end
 
 get '/current_track.json' do
