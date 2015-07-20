@@ -59,9 +59,7 @@ module Spotify
   end
 
   def authenticate
-    return if @authenticated
     RSpotify.authenticate(config[:client_id], config[:client_secret])
-    @authenticated = true
   end
 
   def run(command)
