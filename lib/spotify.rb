@@ -80,7 +80,9 @@ module Spotify
   end
 
   def playing?
-    run('player state').chomp == 'playing'
+    player_state = run('player state').chomp
+    logger.debug("player_state = #{player_state}") if logger
+    player_state == 'playing'
   end
 
   def set_volume(to)
@@ -109,6 +111,10 @@ module Spotify
   def tracks_on_album(id)
     authenticate
     RSpotify::Album.find(id).tracks.map {|t| dto(t)}
+  end
+
+  def queue_empty?
+    queue.empty?
   end
 
   private

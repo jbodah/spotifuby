@@ -22,6 +22,10 @@ class PriorityQueue
     @queues[priority] << val
   end
 
+  def empty?
+    @queues.all? { |p, q| q.empty? }
+  end
+
   def to_s
     @queues.to_s
   end

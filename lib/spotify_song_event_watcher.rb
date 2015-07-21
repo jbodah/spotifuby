@@ -7,22 +7,49 @@ class SpotifySongEventWatcher
 
   def run
     loop do
-      if @spotify.dirty_state?
+      if song_changed?
         @spotify.mutex.synchronize do
-          if @spotify.dirty_state?
-            @logger.info "Dirty state, dequeuing"
-            @spotify.dequeue_and_play
+          # Whenever something is in the queue then we want it to play next
+          # On song end, make sure we play next thing in queue
+          if song_changed?
+            if queue_empty?
+              @logger.info "Song changed but nothing in queue, doing nothing"
+              reset_player_state
+            else
+              @logger.info "Song changed and something in queue, dequeuing"
+              play_next_song_in_queue
+            end
           end
         end
-      elsif @spotify.stuck?
+      elsif player_stuck?
         @spotify.mutex.synchronize do
-          if @spotify.stuck?
+          if player_stuck?
             @logger.info "Stuck, dequeuing"
-            @spotify.dequeue_and_play
+            play_next_song_in_queue
           end
         end
       end
       sleep 0.1
     end
+  end
+
+  def queue_empty?
+    @spotify.queue_empty?
+  end
+
+  def song_changed?
+    @spotify.dirty_state?
+  end
+
+  def play_next_song_in_queue
+    @spotify.dequeue_and_play
+  end
+
+  def player_stuck?
+    @spotify.stuck?
+  end
+
+  def reset_player_state
+    @spotify.reset_state
   end
 end
