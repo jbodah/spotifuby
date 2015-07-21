@@ -1,8 +1,50 @@
 require 'rspotify'
 require 'yaml'
+require_relative 'priority_queue'
 
 module Spotify
   extend self
+
+  attr_accessor :default_uri
+  attr_accessor :logger
+
+  def mutex
+    @mutex ||= Mutex.new
+  end
+
+  def reset_state
+    logger.info("Resetting state") if logger
+    @state = current_track
+    @user_paused = false
+    logger.debug("user_paused = false") if logger
+  end
+
+  def dirty_state?
+    if @state == current_track
+      false
+    else
+      true
+    end
+  end
+
+  def default_uri
+    @default_uri || config[:default_uri]
+  end
+
+  def enqueue_uri(priority, uri)
+    queue.enqueue(priority, uri)
+    logger.info("Queue: #{queue}") if logger
+  end
+
+  def dequeue_and_play
+    uri = queue.dequeue || default_uri
+    play uri if uri
+    logger.info("Queue: #{queue}") if logger
+  end
+
+  def player_position
+    run('player position').chomp.to_f
+  end
 
   def play(uri = nil)
     if uri.nil?
@@ -10,6 +52,7 @@ module Spotify
     else
       run "play track \"#{uri}\""
     end
+    reset_state
   end
 
   def next
@@ -21,7 +64,23 @@ module Spotify
   end
 
   def pause
-    run 'pause'
+    mutex.synchronize do
+      run 'pause'
+      @user_paused = true
+      logger.debug("user_paused = true") if logger
+    end
+  end
+
+  def user_paused?
+    @user_paused
+  end
+
+  def stuck?
+    !user_paused? && !playing?
+  end
+
+  def playing?
+    run('player state').chomp == 'playing'
   end
 
   def set_volume(to)
@@ -56,6 +115,10 @@ module Spotify
 
   def config
     @config ||= YAML.load_file('.spotifuby.yml')
+  end
+
+  def queue
+    @queue ||= PriorityQueue.new
   end
 
   def authenticate
