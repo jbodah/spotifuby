@@ -5,6 +5,7 @@ require_relative 'lib/hash_proxy'
 require_relative 'lib/spotify_song_event_watcher'
 
 Thread.abort_on_exception = true
+set :server, 'webrick'
 
 logger = Logger.new($stdout)
 logger.level = Logger::INFO
