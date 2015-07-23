@@ -91,6 +91,10 @@ module Spotify
   end
 
   def set_volume(to)
+    if to > max_volume
+      logger.info("Told to set volume above max, capping at #{max_volume}") if logger
+      to = max_volume
+    end
     run "set sound volume to #{to}"
   end
 
@@ -123,6 +127,10 @@ module Spotify
   end
 
   private
+
+  def max_volume
+    @max_volume ||= @config[:max_volume] || 100
+  end
 
   def config
     @config ||= YAML.load_file('.spotifuby.yml')
