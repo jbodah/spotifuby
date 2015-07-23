@@ -50,7 +50,12 @@ module Spotify
     if uri.nil?
       run 'play'
     else
-      run "play track \"#{uri}\""
+      if @playing == uri
+        logger.info("Attempting to play the URI that's being played, doing nothing") if logger
+      else
+        @playing = uri
+        run "play track \"#{uri}\""
+      end
     end
     reset_state
   end

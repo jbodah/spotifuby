@@ -12,13 +12,8 @@ class SpotifySongEventWatcher
           # Whenever something is in the queue then we want it to play next
           # On song end, make sure we play next thing in queue
           if song_changed?
-            if queue_empty?
-              @logger.info "Song changed but nothing in queue, doing nothing"
-              reset_player_state
-            else
-              @logger.info "Song changed and something in queue, dequeuing"
-              play_next_song_in_queue
-            end
+            @logger.info "Song changed, dequeuing"
+            play_next_song_in_queue
           end
         end
       elsif player_stuck?
