@@ -129,7 +129,7 @@ module Spotify
   private
 
   def max_volume
-    @max_volume ||= @config[:max_volume] || 100
+    @max_volume ||= config[:max_volume] || 100
   end
 
   def config
