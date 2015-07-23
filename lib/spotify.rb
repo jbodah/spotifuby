@@ -91,7 +91,10 @@ module Spotify
   end
 
   def set_volume(to)
-    to = [to, max_volume].min
+    if to > max_volume
+      logger.info("Told to set volume above max, capping at #{max_volume}") if logger
+      to = max_volume
+    end
     run "set sound volume to #{to}"
   end
 
