@@ -91,6 +91,7 @@ module Spotify
   end
 
   def set_volume(to)
+    to = [to, max_volume].min
     run "set sound volume to #{to}"
   end
 
@@ -123,6 +124,10 @@ module Spotify
   end
 
   private
+
+  def max_volume
+    @max_volume ||= @config[:max_volume] || 100
+  end
 
   def config
     @config ||= YAML.load_file('.spotifuby.yml')
