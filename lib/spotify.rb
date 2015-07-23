@@ -47,17 +47,31 @@ module Spotify
   end
 
   def play(uri = nil)
+    # Avoid getting stuck
+    # if @repeat_hack_enabled
+    #   @repeat_hack_enabled = false
+    #   set_repeat @repeat_hack_pre_value
+    # end
     if uri.nil?
       run 'play'
     else
       if @playing == uri
         logger.info("Attempting to play the URI that's being played, doing nothing") if logger
       else
+        #if is_track_uri?(uri)
+          #@repeat_hack_enabled = true
+          #@repeat_hack_pre_value = get_repeat
+          #set_repeat true
+        #end
         @playing = uri
         run "play track \"#{uri}\""
       end
     end
     reset_state
+  end
+
+  def is_track_uri?(uri)
+    !!uri[/^spotify:track/]
   end
 
   def next
