@@ -1,6 +1,7 @@
 require 'rspotify'
 require 'yaml'
 require_relative 'priority_queue'
+require_relative 'spotify/player'
 
 module Spotify
   extend self
@@ -43,34 +44,34 @@ module Spotify
   end
 
   def player_position
-    run('player position').chomp.to_f
+    player.position
   end
 
   def play(uri = nil)
     if uri.nil?
-      run 'play'
+      player.play
     else
       if @playing == uri
         logger.info("Attempting to play the URI that's being played, doing nothing") if logger
       else
         @playing = uri
-        run "play track \"#{uri}\""
+        player.play(uri)
       end
     end
     reset_state
   end
 
   def next
-    run 'next track'
+    player.next_track
   end
 
   def previous
-    run 'previous track'
+    player.previous_track
   end
 
   def pause
     mutex.synchronize do
-      run 'pause'
+      player.pause
       @user_paused = true
       logger.debug("user_paused = true") if logger
     end
@@ -85,9 +86,7 @@ module Spotify
   end
 
   def playing?
-    player_state = run('player state').chomp
-    logger.debug("player_state = #{player_state}") if logger
-    player_state == 'playing'
+    player.state == :playing
   end
 
   def set_volume(to)
@@ -95,14 +94,11 @@ module Spotify
       logger.info("Told to set volume above max, capping at #{max_volume}") if logger
       to = max_volume
     end
-    run "set sound volume to #{to}"
+    player.volume = to
   end
 
   def current_track
-    [:name, :artist, :album].reduce({}) do |memo, sym|
-      memo[sym] = run "#{sym} of current track as string"
-      memo
-    end
+    player.currently_playing
   end
 
   [:artist, :album, :track].each do |sym|
@@ -128,6 +124,10 @@ module Spotify
 
   private
 
+  def player
+    @player ||= Player.new
+  end
+
   def max_volume
     @max_volume ||= config[:max_volume] || 100
   end
@@ -142,10 +142,6 @@ module Spotify
 
   def authenticate
     RSpotify.authenticate(config[:client_id], config[:client_secret])
-  end
-
-  def run(command)
-    `osascript -e 'tell application \"Spotify\" to #{command}'`
   end
 
   def dto(obj)
