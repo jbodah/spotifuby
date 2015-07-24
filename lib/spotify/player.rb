@@ -1,7 +1,8 @@
 module Spotify
   # Responsible for managing interactions with Spotify instance
   class Player
-    def initialize(executor = ShellExecutor)
+    def initialize(max_volume: 100, executor: ShellExecutor)
+      @max_volume = max_volume || 100
       @executor = executor
     end
 
@@ -31,10 +32,12 @@ module Spotify
       execute('player position').to_f
     end
 
-    # Set the volume of the player
-    # @param [Integer] to
-    def volume=(to)
-      execute "set sound volume to #{to}"
+    # Set the volume of the player. Will use max volume if
+    # given volume is too high
+    # @param [Integer] v
+    def volume=(v)
+      v = [v, @max_volume].min
+      execute "set sound volume to #{v}"
     end
 
     # Returns the state of the player

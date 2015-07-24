@@ -28,10 +28,6 @@ class SpotifySongEventWatcher
     end
   end
 
-  def queue_empty?
-    @spotify.queue_empty?
-  end
-
   def song_changed?
     @spotify.dirty_state?
   end
@@ -42,9 +38,5 @@ class SpotifySongEventWatcher
 
   def player_stuck?
     @spotify.stuck?
-  end
-
-  def reset_player_state
-    @spotify.reset_state
   end
 end
