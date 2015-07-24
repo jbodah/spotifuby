@@ -1,6 +1,5 @@
 require 'rspotify'
 require 'yaml'
-require_relative 'priority_queue'
 require_relative 'spotify/player'
 
 module Spotify
@@ -11,55 +10,30 @@ module Spotify
   attr_reader :mutex
 
   def initialize
-    config = YAML.load_file('.spotifuby.yml')
-    @queue  = PriorityQueue.new
+    config  = YAML.load_file('.spotifuby.yml')
+    @queue  = Queue.new
     @player = Player.new(max_volume: config[:max_volume])
     @web    = Web.new(config[:client_id], config[:client_secret])
     @mutex  = Mutex.new
     @default_uri = config[:default_uri]
   end
 
-  def reset_state
-    logger.info("Resetting state") if logger
-    @state = current_track
-    @user_paused = false
-  end
-
-  def dirty_state?
-    if @state == current_track
-      false
-    else
-      true
-    end
-  end
-
   def enqueue_uri(priority, uri)
-    @queue.enqueue(priority, uri)
-    logger.info("Queue: #{@queue}") if logger
-  end
-
-  def dequeue_and_play
-    uri = @queue.dequeue || @default_uri
-    play uri if uri
-    logger.info("Queue: #{@queue}") if logger
-  end
-
-  def queue_empty?
-    @queue.empty?
+    @queue.enq(uri)
+    spawn_song_end_watcher
   end
 
   def play(uri = nil)
     if uri.nil?
       @player.play
     else
-      if @playing == uri
+      if @current_uri == uri
         logger.info("Attempting to play the URI that's being played, doing nothing") if logger
       else
-        @playing = uri
+        @current_uri = uri
         @player.play(uri)
       end
     end
-    reset_state
   end
 
   def player_position
@@ -83,14 +57,7 @@ module Spotify
   end
 
   def pause
-    @mutex.synchronize do
-      @player.pause
-      @user_paused = true
-    end
-  end
-
-  def stuck?
-    !@user_paused && @player.state != :playing
+    @player.pause
   end
 
   [:artist, :album, :track].each do |sym|
@@ -105,5 +72,38 @@ module Spotify
 
   def tracks_on_album(id)
     @web.tracks_on_album(id).map(&:to_hash)
+  end
+
+  private
+
+  def spawn_song_end_watcher
+    @mutex.synchronize do
+      # Up pending counter
+      @pending_watchers += 1
+      # Create watcher if we don't already have one running
+      create_song_end_watcher unless running_watcher?
+    end
+  end
+
+  # Called from watcher
+  def dequeue_and_play
+    @mutex.synchronize do
+      # Down pending counter
+      @pending_watchers -= 1
+      # Do work
+      play @queue.empty? ? @queue.deq : @default_uri
+      # Clear current watcher
+      @current_watcher = nil
+      # Chain off new watcher if we still have more pending
+      create_song_end_watcher if @pending_watchers > 0
+    end
+  end
+
+  def running_watcher?
+    !@current_watcher.nil?
+  end
+
+  def create_song_end_watcher
+    @current_watcher = SpotifySongEventWatcher.spawn(self, then: method(:dequeue_and_play))
   end
 end
