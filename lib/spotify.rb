@@ -1,157 +1,89 @@
 require 'rspotify'
 require 'yaml'
-require_relative 'priority_queue'
+require 'spotify/player'
+require 'spotify/web'
+require 'spotify/async'
 
 module Spotify
-  extend self
-
-  attr_accessor :default_uri
-  attr_accessor :logger
-
-  def mutex
-    @mutex ||= Mutex.new
-  end
-
-  def reset_state
-    logger.info("Resetting state") if logger
-    @state = current_track
-    @user_paused = false
-    logger.debug("user_paused = false") if logger
-  end
-
-  def dirty_state?
-    if @state == current_track
-      false
-    else
-      true
+  class << self
+    def create
+      Spotify::Instance.new
     end
   end
 
-  def default_uri
-    @default_uri || config[:default_uri]
-  end
+  class Instance
+    attr_accessor :default_uri, :logger
 
-  def enqueue_uri(priority, uri)
-    queue.enqueue(priority, uri)
-    logger.info("Queue: #{queue}") if logger
-  end
+    def initialize
+      config  = YAML.load_file('.spotifuby.yml')
+      @player = Player.new(max_volume: config[:max_volume])
+      @web    = Web.new(config[:client_id], config[:client_secret])
+      @async  = Async.new(self)
+      @default_uri = config[:default_uri]
+    end
 
-  def dequeue_and_play
-    uri = queue.dequeue || default_uri
-    play uri if uri
-    logger.info("Queue: #{queue}") if logger
-  end
+    def enqueue_uri(uri)
+      @async.enqueue(uri)
+    end
 
-  def player_position
-    run('player position').chomp.to_f
-  end
+    def play_default_uri
+      play @default_uri
+    end
 
-  def play(uri = nil)
-    if uri.nil?
-      run 'play'
-    else
-      if @playing == uri
-        logger.info("Attempting to play the URI that's being played, doing nothing") if logger
+    def play(uri = nil)
+      if uri.nil?
+        @player.play
       else
-        @playing = uri
-        run "play track \"#{uri}\""
+        if @current_uri == uri
+          logger.info("Attempting to play the URI that's being played, doing nothing") if logger
+        else
+          @current_uri = uri
+          @player.play(uri)
+        end
       end
     end
-    reset_state
-  end
 
-  def next
-    run 'next track'
-  end
-
-  def previous
-    run 'previous track'
-  end
-
-  def pause
-    mutex.synchronize do
-      run 'pause'
-      @user_paused = true
-      logger.debug("user_paused = true") if logger
+    def player_position
+      @player.position
     end
-  end
 
-  def user_paused?
-    @user_paused
-  end
-
-  def stuck?
-    !user_paused? && !playing?
-  end
-
-  def playing?
-    player_state = run('player state').chomp
-    logger.debug("player_state = #{player_state}") if logger
-    player_state == 'playing'
-  end
-
-  def set_volume(to)
-    if to > max_volume
-      logger.info("Told to set volume above max, capping at #{max_volume}") if logger
-      to = max_volume
+    def next
+      @player.next_track
+      @async.notify_skip
     end
-    run "set sound volume to #{to}"
-  end
 
-  def current_track
-    [:name, :artist, :album].reduce({}) do |memo, sym|
-      memo[sym] = run "#{sym} of current track as string"
-      memo
+    def previous
+      @player.previous_track
     end
-  end
 
-  [:artist, :album, :track].each do |sym|
-    define_method "search_#{sym}" do |q|
-      authenticate
-      RSpotify.const_get(sym.capitalize).search(q).map {|o| dto(o)}
+    def set_volume(v)
+      @player.volume = v
     end
-  end
 
-  def albums_by_artist(id)
-    authenticate
-    RSpotify::Artist.find(id).albums.map {|a| dto(a)}
-  end
+    def track_duration
+      @player.track_duration
+    end
 
-  def tracks_on_album(id)
-    authenticate
-    RSpotify::Album.find(id).tracks.map {|t| dto(t)}
-  end
+    def current_track
+      @player.currently_playing
+    end
 
-  def queue_empty?
-    queue.empty?
-  end
+    def pause
+      @player.pause
+    end
 
-  private
+    [:artist, :album, :track].each do |sym|
+      define_method "search_#{sym}" do |q|
+        @web.search(sym, q).map(&:to_hash)
+      end
+    end
 
-  def max_volume
-    @max_volume ||= config[:max_volume] || 100
-  end
+    def albums_by_artist(id)
+      @web.albums_by_artist(id).map(&:to_hash)
+    end
 
-  def config
-    @config ||= YAML.load_file('.spotifuby.yml')
-  end
-
-  def queue
-    @queue ||= PriorityQueue.new
-  end
-
-  def authenticate
-    RSpotify.authenticate(config[:client_id], config[:client_secret])
-  end
-
-  def run(command)
-    `osascript -e 'tell application \"Spotify\" to #{command}'`
-  end
-
-  def dto(obj)
-    # TODO cleanup
-    { name: obj.name, uri: obj.uri, id: obj.id }.tap do |x|
-      x.define_singleton_method :method_missing, -> (sym) { obj.public_send(sym) }
+    def tracks_on_album(id)
+      @web.tracks_on_album(id).map(&:to_hash)
     end
   end
 end
