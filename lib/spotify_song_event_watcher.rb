@@ -1,50 +1,47 @@
+require 'thread'
+
 class SpotifySongEventWatcher
+  class << self
+    def spawn(spotify, callback: nil)
+      Thread.new { new(spotify, callback: callback).run }
+    end
+  end
+
   def initialize(spotify, opts = {})
-    @logger = opts[:logger]
-    @spotify = spotify
-    @spotify.reset_state
+    @spotify          = spotify
+    @callback         = opts[:callback]
+    @initial_track    = @spotify.current_track
+    @current_position = @spotify.player_position
+    @track_length     = @spotify.track_duration
+    @time_start       = Time.now
   end
 
   def run
     loop do
-      if song_changed?
-        @spotify.mutex.synchronize do
-          # Whenever something is in the queue then we want it to play next
-          # On song end, make sure we play next thing in queue
-          if song_changed?
-            @logger.info "Song changed, dequeuing"
-            play_next_song_in_queue
-          end
-        end
-      elsif player_stuck?
-        @spotify.mutex.synchronize do
-          if player_stuck?
-            @logger.info "Stuck, dequeuing"
-            play_next_song_in_queue
-          end
-        end
-      end
+      return (@callback ? @callback.call : true) if song_changed?
       sleep 0.1
     end
   end
 
-  def queue_empty?
-    @spotify.queue_empty?
-  end
-
   def song_changed?
-    @spotify.dirty_state?
+    case
+    when @initial_track != @spotify.current_track
+      puts 'track change'
+      true
+    when @current_position > @spotify.player_position
+      puts 'player position change'
+      true
+    when time_passed > @track_length && @player.state == :playing
+      puts 'song duration passed'
+      true
+    else
+      false
+    end
+  ensure
+    @current_position = @spotify.player_position
   end
 
-  def play_next_song_in_queue
-    @spotify.dequeue_and_play
-  end
-
-  def player_stuck?
-    @spotify.stuck?
-  end
-
-  def reset_player_state
-    @spotify.reset_state
+  def time_passed
+    Time.now - @time_start
   end
 end
