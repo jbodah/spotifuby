@@ -9,3 +9,5 @@ gem 'guard-minitest', require: false
 gem 'minitest', require: false
 gem 'terminal-notifier-guard', require: false
 gem 'mocha', require: false
+
+gem 'pry', require: false

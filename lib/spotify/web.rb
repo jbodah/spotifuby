@@ -2,7 +2,7 @@ require 'spotify/search_result'
 
 module Spotify
   class Web
-    def intialize(client_id, client_secret)
+    def initialize(client_id, client_secret)
       RSpotify.authenticate(client_id, client_secret)
     end
 

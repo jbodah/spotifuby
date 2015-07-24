@@ -40,6 +40,10 @@ module Spotify
       execute "set sound volume to #{v}"
     end
 
+    def track_duration
+      execute('duration of current track').chomp.to_i
+    end
+
     # Returns the state of the player
     # @return [Symbol] :playing, :paused, :stopped
     def state
@@ -71,11 +75,13 @@ module Spotify
     private
 
     def execute(command)
-      @executor.call %Q(osascript -e 'tell application \\\"Spotify\\\" to #{command}')
+      @executor.call %Q(osascript -e 'tell application \"Spotify\" to #{command}')
     end
   end
 
   module ShellExecutor
+    extend self
+
     def call(command)
       `#{command}`.chomp
     end

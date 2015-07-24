@@ -94,6 +94,7 @@ DEPENDENCIES
   guard-minitest
   minitest
   mocha
+  pry
   rake
   rspotify
   sinatra

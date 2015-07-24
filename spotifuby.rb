@@ -1,90 +1,82 @@
 require 'sinatra'
 require 'json'
-require_relative 'lib/spotify'
-require_relative 'lib/hash_proxy'
-require_relative 'lib/spotify_song_event_watcher'
+require 'spotify'
+require 'hash_proxy'
+
+set server: :webrick
 
 Thread.abort_on_exception = true
 
-logger = Logger.new($stdout)
-logger.level = Logger::INFO
-
-w = SpotifySongEventWatcher.new(Spotify, logger: logger)
-Thread.new { w.run }
-
-Spotify.logger = logger
+SPOTIFY = Spotify.create
+SPOTIFY.logger = Logger.new($stdout).tap {|x| x.level = Logger::INFO}
 
 before do
   if @request.content_type == 'application/json' &&
      @request.request_method == 'POST'
-    @data = HashProxy.new(JSON.parse(@request.body.read))
+    body = @request.body.read
+    body = (body.nil? || body.empty?) ? {} : JSON.parse(body)
+    @data = HashProxy.new(body)
   end
 end
 
 # Web root
 get '/' do
-  @current_track = Spotify.current_track
+  @current_track = SPOTIFY.current_track
   erb :index
 end
 
 post '/play.json' do
-  Spotify.mutex.synchronize do
-    Spotify.play(@data.uri)
-  end
+  SPOTIFY.play(@data.uri)
 end
 
 post '/pause.json' do
-  Spotify.pause
+  SPOTIFY.pause
 end
 
 post '/next.json' do
-  Spotify.next
+  SPOTIFY.next
 end
 
 post '/previous.json' do
-  Spotify.previous
+  SPOTIFY.previous
 end
 
 post '/set_volume.json' do
-  Spotify.set_volume(Integer(@data.volume))
+  SPOTIFY.set_volume(Integer(@data.volume))
 end
 
 post '/enqueue.json' do
-  priority = @data.priority
-  priority = priority.to_sym if priority
-  Spotify.enqueue_uri(priority, @data.uri)
+  SPOTIFY.enqueue_uri(@data.uri)
 end
 
 post '/set_default_uri.json' do
-  Spotify.default_uri = @data.uri
+  SPOTIFY.default_uri = @data.uri
 end
 
 post '/play_default_uri.json' do
-  Spotify.mutex.synchronize do
-    Spotify.play(Spotify.default_uri)
-  end
+  SPOTIFY.play_default_uri
 end
 
 get '/current_track.json' do
-  Spotify.current_track.to_json
+  SPOTIFY.current_track.to_json
 end
 
 get '/search_artist.json' do
-  Spotify.search_artist(params[:q]).to_json
+  SPOTIFY.search_artist(params[:q]).to_json
 end
 
 get '/search_album.json' do
-  Spotify.search_album(params[:q]).to_json
+  SPOTIFY.search_album(params[:q]).to_json
 end
 
 get '/search_track.json' do
-  Spotify.search_track(params[:q]).to_json
+  SPOTIFY.search_track(params[:q]).to_json
 end
 
 get '/albums_by_artist.json' do
-  Spotify.albums_by_artist(params[:id]).to_json
+  SPOTIFY.albums_by_artist(params[:id]).to_json
 end
 
 get '/tracks_on_album.json' do
-  Spotify.tracks_on_album(params[:id]).to_json
+  SPOTIFY.tracks_on_album(params[:id]).to_json
 end
