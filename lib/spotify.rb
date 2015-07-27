@@ -20,6 +20,7 @@ module Spotify
       @web    = Web.new(config[:client_id], config[:client_secret])
       @async  = Async.new(self)
       @default_uri = config[:default_uri]
+      @default_user = config[:default_user]
     end
 
     def enqueue_uri(uri)
@@ -84,6 +85,10 @@ module Spotify
 
     def tracks_on_album(id)
       @web.tracks_on_album(id).map(&:to_hash)
+    end
+
+    def who_added_track
+      @web.who_added_track(@default_user, @default_uri, @player.current_track_id)
     end
   end
 end

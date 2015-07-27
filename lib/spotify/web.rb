@@ -18,6 +18,24 @@ module Spotify
       cast RSpotify::Album.find(album).tracks
     end
 
+    def who_added_track(user, playlist_uri, track_uri)
+      track_id = track_uri.sub('spotify:track:', '')
+      playlist_id = playlist_uri.sub("spotify:user:#{user}:playlist:", '')
+      all_songs = {}
+
+      playlist = RSpotify::Playlist.find(user, playlist_id)
+      current_offset = 0
+
+      tracks = playlist.tracks(offset: current_offset)
+      all_songs.merge!(playlist.tracks_added_by)
+      while tracks.count > 0 do
+        current_offset += 100
+        tracks = playlist.tracks(offset: current_offset)
+        all_songs.merge!(playlist.tracks_added_by)
+      end
+
+      all_songs[track_id]
+    end
     private
 
     def cast(collection)
