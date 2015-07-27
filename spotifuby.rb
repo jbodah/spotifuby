@@ -80,3 +80,7 @@ end
 get '/tracks_on_album.json' do
   SPOTIFY.tracks_on_album(params[:id]).to_json
 end
+
+get '/who_added_track.json' do
+  SPOTIFY.who_added_track.to_json
+end
