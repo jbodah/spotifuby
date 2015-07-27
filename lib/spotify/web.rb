@@ -34,7 +34,7 @@ module Spotify
         all_songs.merge!(playlist.tracks_added_by)
       end
 
-      all_songs[track_id]
+      { name: all_songs[track_id].id }
     end
     private
 
