@@ -64,6 +64,10 @@ module Spotify
       execute 'name of current track as string'
     end
 
+    def current_track_id
+      execute 'id of current track as string'
+    end
+
     def current_artist
       execute 'artist of current track as string'
     end
