@@ -26,6 +26,20 @@ ps aux | grep spotifuby | grep -v grep | awk '{ print $2 }' | xargs kill
 The routes for Spotifuby is dynamically generated based on the
 methods provided by the `Spotify` module. See spotifuby.rb for details.
 
+## Configuration
+
+All server configuration is done in the `.spotifuby.yml` file. Here's an example of one:
+
+```yml
+---
+:client_id: my_id
+:client_secret: my_secret
+:default_uri: spotify:user:myuser:playlist:7283jlsfj8f
+:max_volume: 65
+```
+
+Check out [your spotify apps](https://developer.spotify.com/my-applications/#!/applications) for the proper keys.
+
 # Thanks
 
 Big thanks to @hnarayanan for the shpotify repo
