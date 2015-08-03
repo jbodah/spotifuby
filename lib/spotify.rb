@@ -15,11 +15,9 @@ module Spotify
     attr_accessor :default_uri, :logger
 
     def initialize
-      config  = YAML.load_file('.spotifuby.yml')
-      @player = Player.new(max_volume: config[:max_volume])
-      @web    = Web.new(config[:client_id], config[:client_secret])
+      @config = YAML.load_file('.spotifuby.yml')
+      @player = Player.new(max_volume: max_volume)
       @async  = Async.new(self)
-      @default_uri = config[:default_uri]
     end
 
     def enqueue_uri(uri)
@@ -27,7 +25,7 @@ module Spotify
     end
 
     def play_default_uri
-      play @default_uri
+      play default_uri
     end
 
     def play(uri = nil)
@@ -84,6 +82,28 @@ module Spotify
 
     def tracks_on_album(id)
       @web.tracks_on_album(id).map(&:to_hash)
+    end
+
+    private
+
+    def web
+      Web.new(client_id, client_secret)
+    end
+
+    def client_id
+      @config[:client_id]
+    end
+
+    def client_secret
+      @config[:client_secret]
+    end
+
+    def default_uri
+      @config[:default_uri]
+    end
+
+    def max_volume
+      @config[:max_volume]
     end
   end
 end
