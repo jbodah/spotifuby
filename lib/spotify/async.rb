@@ -52,6 +52,10 @@ module Spotify
           @spotify.play(@queue.deq)
         end
 
+        # TODO: not sure this belongs here
+        # sleep before spawning the next watcher
+        sleep 1
+
         # Chain off new watcher if we still have more pending
         @current_watcher = (create_song_end_watcher if @pending > 0)
       end

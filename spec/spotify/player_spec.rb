@@ -25,7 +25,7 @@ module Spotify
       describe 'without an argument' do
         it 'tries to execute the play command by itself' do
           @player.play
-          expected = "osascript -e 'tell application \\\"Spotify\\\" to play'"
+          expected = "osascript -e 'tell application \"Spotify\" to play'"
           assert_equal expected, @executor.received[0]
         end
       end
@@ -33,7 +33,7 @@ module Spotify
       describe 'with a uri' do
         it 'tries to execute the play command with the uri' do
           @player.play(123)
-          expected = "osascript -e 'tell application \\\"Spotify\\\" to play track \"123\"'"
+          expected = "osascript -e 'tell application \"Spotify\" to play track \"123\"'"
           assert_equal expected, @executor.received[0]
         end
       end
@@ -47,7 +47,7 @@ module Spotify
 
       it 'tries to execute the next track command' do
         @player.next_track
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to next track'"
+        expected = "osascript -e 'tell application \"Spotify\" to next track'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -60,7 +60,7 @@ module Spotify
 
       it 'tries to execute the previous track command' do
         @player.previous_track
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to previous track'"
+        expected = "osascript -e 'tell application \"Spotify\" to previous track'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -73,7 +73,7 @@ module Spotify
 
       it 'tries to execute the pause command' do
         @player.pause
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to pause'"
+        expected = "osascript -e 'tell application \"Spotify\" to pause'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -86,7 +86,7 @@ module Spotify
 
       it 'tries to execute the position command' do
         assert_equal 12.34, @player.position
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to player position'"
+        expected = "osascript -e 'tell application \"Spotify\" to player position'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -99,7 +99,7 @@ module Spotify
 
       it 'tries to execute the current name command' do
         @player.current_track
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to name of current track as string'"
+        expected = "osascript -e 'tell application \"Spotify\" to name of current track as string'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -112,7 +112,7 @@ module Spotify
 
       it 'tries to execute the current artist command' do
         @player.current_artist
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to artist of current track as string'"
+        expected = "osascript -e 'tell application \"Spotify\" to artist of current track as string'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -125,7 +125,7 @@ module Spotify
 
       it 'tries to execute the current album command' do
         @player.current_album
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to album of current track as string'"
+        expected = "osascript -e 'tell application \"Spotify\" to album of current track as string'"
         assert_equal expected, @executor.received[0]
       end
     end
@@ -153,7 +153,7 @@ module Spotify
 
         it 'tries to execute the set volume command' do
           @player.volume = 30
-          expected = "osascript -e 'tell application \\\"Spotify\\\" to set sound volume to 30'"
+          expected = "osascript -e 'tell application \"Spotify\" to set sound volume to 30'"
           assert_equal expected, @executor.received[0]
         end
       end
@@ -166,7 +166,7 @@ module Spotify
 
         it 'respects the max volume constraint' do
           @player.volume = 30
-          expected = "osascript -e 'tell application \\\"Spotify\\\" to set sound volume to 10'"
+          expected = "osascript -e 'tell application \"Spotify\" to set sound volume to 10'"
           assert_equal expected, @executor.received[0]
         end
       end
@@ -180,7 +180,7 @@ module Spotify
 
       it 'tries to execute the player state command' do
         assert_equal :paused, @player.state
-        expected = "osascript -e 'tell application \\\"Spotify\\\" to player state'"
+        expected = "osascript -e 'tell application \"Spotify\" to player state'"
         assert_equal expected, @executor.received[0]
       end
     end
