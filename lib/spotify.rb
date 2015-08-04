@@ -84,7 +84,10 @@ module Spotify
       @web.tracks_on_album(id).map(&:to_hash)
     end
 
-    def who_added_track
+    def who_added_track(track_uri)
+      uri = track_uri || @player.current_track_uri
+      track_id = uri.split(':').last
+      playlist_id = default_playlist_uri.split(':').last
       @web.who_added_track(default_user, default_uri, @player.current_track_id)
     end
 
@@ -100,6 +103,11 @@ module Spotify
 
     def client_secret
       @config[:client_secret]
+    end
+
+    # TODO
+    def default_playlist_uri
+      default_uri
     end
 
     def default_uri

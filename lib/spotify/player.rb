@@ -26,32 +26,30 @@ module Spotify
       execute 'previous track'
     end
 
-    # How far the current track is in the song
-    # @return [Float]
+    # @return [Float] how far the currently playing track is in the song
     def position
       execute('player position').to_f
     end
 
     # Set the volume of the player. Will use max volume if
     # given volume is too high
-    # @param [Integer] v
+    # @param [Integer] v the value to set the volume to
     def volume=(v)
       v = [v, @max_volume].min
       execute "set sound volume to #{v}"
     end
 
+    # @return [Integer] the total length of the currently playing track
     def track_duration
       execute('duration of current track').chomp.to_i
     end
 
-    # Returns the state of the player
-    # @return [Symbol] :playing, :paused, :stopped
-    def state
+    # @return [Symbol] the state of the player.
+    #   States include :playing, :paused, :stopped
       execute('player state').to_sym
     end
 
-    # Returns a hash on whats currently playing
-    # @return [Hash] with :name, :artist, :album
+    # @return [Hash] the :name, :artist, and :album of the currently playing track
     def currently_playing
       {
         name:   current_track,
@@ -60,18 +58,22 @@ module Spotify
       }
     end
 
+    # @return [String] track URI of the currently playing track
+    def current_track_uri
+      execute 'id of current track as string'
+    end
+
+    # @return [String] name of the currently playing track
     def current_track
       execute 'name of current track as string'
     end
 
-    def current_track_id
-      execute 'id of current track as string'
-    end
-
+    # @return [String] artist of the currently playing track
     def current_artist
       execute 'artist of current track as string'
     end
 
+    # @return [String] album of the currently playing track
     def current_album
       execute 'album of current track as string'
     end
