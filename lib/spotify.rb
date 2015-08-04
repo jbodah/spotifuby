@@ -21,7 +21,7 @@ module Spotify
     end
 
     def enqueue_uri(uri)
-      @async.enqueue(uri)
+      async.enqueue(uri)
     end
 
     def play_default_uri
@@ -30,68 +30,76 @@ module Spotify
 
     def play(uri = nil)
       if uri.nil?
-        @player.play
+        player.play
       else
         if @current_uri == uri
           logger.info("Attempting to play the URI that's being played, doing nothing") if logger
         else
           @current_uri = uri
-          @player.play(uri)
+          player.play(uri)
         end
       end
     end
 
     def player_position
-      @player.position
+      player.position
     end
 
     def next
-      @player.next_track
-      @async.notify_skip
+      player.next_track
+      async.notify_skip
     end
 
     def previous
-      @player.previous_track
+      player.previous_track
     end
 
     def set_volume(v)
-      @player.volume = v
+      player.volume = v
     end
 
     def track_duration
-      @player.track_duration
+      player.track_duration
     end
 
     def current_track
-      @player.currently_playing
+      player.currently_playing
     end
 
     def pause
-      @player.pause
+      player.pause
     end
 
     [:artist, :album, :track].each do |sym|
       define_method "search_#{sym}" do |q|
-        @web.search(sym, q).map(&:to_hash)
+        web.search(sym, q).map(&:to_hash)
       end
     end
 
     def albums_by_artist(id)
-      @web.albums_by_artist(id).map(&:to_hash)
+      web.albums_by_artist(id).map(&:to_hash)
     end
 
     def tracks_on_album(id)
-      @web.tracks_on_album(id).map(&:to_hash)
+      web.tracks_on_album(id).map(&:to_hash)
     end
 
     def who_added_track
-      @web.who_added_track(default_user, default_uri, @player.current_track_id)
+      web.who_added_track(default_user, default_uri, player.current_track_id)
     end
 
     private
 
     def web
       Web.new(client_id, client_secret)
+    end
+
+    def player
+      @player
+    end
+
+    def async
+      @async
     end
 
     def client_id
