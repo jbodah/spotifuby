@@ -18,6 +18,8 @@ module Spotify
       @config = YAML.load_file('.spotifuby.yml')
       @player = Player.new(max_volume: max_volume)
       @async  = Async.new(self)
+      @playlist = web.get_current_playlist(default_user, default_uri)
+      @last_playlist_build = Time.now
     end
 
     def enqueue_uri(uri)
@@ -89,7 +91,13 @@ module Spotify
     end
 
     def playlist
-      @playlist ||= web.get_current_playlist(default_user, default_uri)
+      # rebuild playist if older than an hour
+      if Time.now - @last_playlist_build > 3600
+        @playlist = web.get_current_playlist(default_user, default_uri)
+        @last_build = Time.now
+      end
+
+      @play_list
     end
 
     private
