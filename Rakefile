@@ -16,3 +16,13 @@ end
 
 desc 'Restart public server'
 task :restart => [:stop, :start]
+
+require 'rake/testtask'
+
+Rake::TestTask.new do |t|
+  t.libs << "spec"
+  t.test_files = FileList['spec/**/*spec.rb']
+  t.verbose = true
+end
+
+task :default => [:test]
