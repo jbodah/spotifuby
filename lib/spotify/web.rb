@@ -23,7 +23,7 @@ module Spotify
   def who_added_track(playlist, track_uri)
     track_id = track_uri.sub('spotify:track:', '')
     uid = playlist[track_id].id
-    blame = RSpotify::User.find(uid) || uid
+    blame = uid.nil? ? 'zero' : (RSpotify::User.find(uid).display_name || uid)
 
     { name: blame }
   end
