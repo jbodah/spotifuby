@@ -38,6 +38,7 @@ All server configuration is done in the `.spotifuby.yml` file. Here's an example
 :client_secret: my_secret
 :default_uri: spotify:user:myuser:playlist:7283jlsfj8f
 :max_volume: 65
+:default_user: myuser
 ```
 
 Check out [your spotify apps](https://developer.spotify.com/my-applications/#!/applications) for the proper keys.
