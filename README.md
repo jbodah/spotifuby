@@ -1,5 +1,7 @@
 # Spotifuby
 
+[![Build Status](https://travis-ci.org/jbodah/spotifuby.svg?branch=master)](https://travis-ci.org/jbodah/spotifuby)
+
 Ruby server for interacting with Spotify on OSX
 
 ## Description
