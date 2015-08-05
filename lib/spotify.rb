@@ -85,7 +85,11 @@ module Spotify
     end
 
     def who_added_track
-      web.who_added_track(default_user, default_uri, player.current_track_id)
+      web.who_added_track(playlist, player.current_track_id)
+    end
+
+    def playlist
+      @playlist ||= web.get_current_playlist(default_user, default_uri)
     end
 
     private
