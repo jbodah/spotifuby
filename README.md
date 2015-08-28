@@ -4,6 +4,8 @@
 
 Ruby server for interacting with Spotify on OSX
 
+For clients, see the Ruby module [spotifuby-client](https://github.com/jbodah/spotifuby-client) or the NPM package [hubot-spotifuby](https://github.com/jbodah/hubot-spotifuby)
+
 ## Description
 
 Spotifuby is meant to provide a web interface for controlling Spotify.
