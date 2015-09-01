@@ -4,7 +4,7 @@ class SpotifySpec < Minitest::Spec
   describe 'private' do
     describe '#web' do
       before do
-        Spotify.any_instance.stubs(:config).returns({})
+        Spotify::Instance.any_instance.stubs(:config).returns({})
         @spotify = Spotify.create
       end
 
