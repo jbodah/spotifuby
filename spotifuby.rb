@@ -1,5 +1,8 @@
 require 'sinatra'
 require 'json'
+
+$LOAD_PATH << 'lib'
+
 require 'spotify'
 require 'hash_proxy'
 
@@ -27,34 +30,42 @@ end
 
 post '/play.json' do
   SPOTIFY.play(@data.uri)
+  200
 end
 
 post '/pause.json' do
   SPOTIFY.pause
+  200
 end
 
 post '/next.json' do
   SPOTIFY.next
+  200
 end
 
 post '/previous.json' do
   SPOTIFY.previous
+  200
 end
 
 post '/set_volume.json' do
   SPOTIFY.set_volume(Integer(@data.volume))
+  200
 end
 
 post '/enqueue.json' do
   SPOTIFY.enqueue_uri(@data.uri)
+  200
 end
 
 post '/set_default_uri.json' do
   SPOTIFY.default_uri = @data.uri
+  200
 end
 
 post '/play_default_uri.json' do
   SPOTIFY.play_default_uri
+  200
 end
 
 get '/current_track.json' do
