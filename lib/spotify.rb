@@ -20,6 +20,7 @@ module Spotify
     end
 
     def enqueue_uri(uri)
+      logger.debug("Enqueuing URI #{uri}") if logger
       async.enqueue(uri)
     end
 
@@ -29,7 +30,7 @@ module Spotify
 
     def play(uri = nil)
       if uri.nil?
-        logger.debug("Playing without URI") if logger
+        logger.debug('Playing without URI') if logger
         player.play
       else
         if @current_uri == uri
