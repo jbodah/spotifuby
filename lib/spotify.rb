@@ -29,11 +29,19 @@ module Spotify
 
     def play(uri = nil)
       if uri.nil?
+        logger.debug("Playing without URI") if logger
         player.play
       else
         if @current_uri == uri
           logger.info("Attempting to play the URI that's being played, doing nothing") if logger
         else
+          if logger
+            if uri == default_uri
+              logger.debug 'Playing with default URI'
+            else
+              logger.debug "Playing with URI #{uri}"
+            end
+          end
           @current_uri = uri
           player.play(uri)
         end

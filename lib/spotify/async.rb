@@ -38,8 +38,6 @@ module Spotify
       @mutex.synchronize do
         return unless @current_id == id
 
-        puts "resolving watcher #{@queue.empty?}"
-
         @current_id = nil
 
         # Down pending counter
@@ -66,7 +64,6 @@ module Spotify
     end
 
     def create_song_end_watcher
-      puts 'creating watcher'
       @current_id = id = SecureRandom.uuid
       SpotifySongEventWatcher.spawn(@spotify, callback: -> { dequeue_and_play(id) })
     end

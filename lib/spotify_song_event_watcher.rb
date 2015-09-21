@@ -26,13 +26,10 @@ class SpotifySongEventWatcher
   def song_changed?
     case
     when @initial_track != @spotify.current_track
-      puts 'track change'
       true
     when @current_position > @spotify.player_position
-      puts 'player position change'
       true
     when time_passed > @track_length && @player.state == :playing
-      puts 'song duration passed'
       true
     else
       false

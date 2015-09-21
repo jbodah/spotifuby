@@ -11,7 +11,7 @@ set server: :webrick
 Thread.abort_on_exception = true
 
 SPOTIFY = Spotify.create
-SPOTIFY.logger = Logger.new($stdout).tap {|x| x.level = Logger::INFO}
+SPOTIFY.logger = Logger.new($stdout).tap {|x| x.level = Logger::DEBUG}
 
 before do
   if @request.content_type == 'application/json' &&
