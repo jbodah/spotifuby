@@ -6,7 +6,7 @@
 
 Ruby server for interacting with Spotify on OSX
 
-For clients, see the Ruby module [spotifuby-client](https://github.com/jbodah/spotifuby-client) or the NPM package [hubot-spotifuby](https://github.com/jbodah/hubot-spotifuby)
+For clients, see the `Spotifuby::Client` and `Spotifuby::Bot` or use the NPM package [hubot-spotifuby](https://github.com/jbodah/hubot-spotifuby)
 
 ## Description
 
