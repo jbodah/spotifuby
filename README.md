@@ -1,6 +1,8 @@
 # Spotifuby
 
 [![Build Status](https://travis-ci.org/jbodah/spotifuby.svg?branch=master)](https://travis-ci.org/jbodah/spotifuby)
+[![Coverage Status](https://coveralls.io/repos/jbodah/spotifuby/badge.svg?branch=master&service=github)](https://coveralls.io/github/jbodah/spotifuby?branch=master)
+[![Code Climate](https://codeclimate.com/github/jbodah/spotifuby/badges/gpa.svg)](https://codeclimate.com/github/jbodah/spotifuby)
 
 Ruby server for interacting with Spotify on OSX
 
