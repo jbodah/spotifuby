@@ -1,3 +1,12 @@
+require 'simplecov'
+require 'coveralls'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
+SimpleCov.start
+
 $LOAD_PATH.push 'lib', __FILE__
 require 'spotify'
 require 'minitest/autorun'

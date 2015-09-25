@@ -10,5 +10,6 @@ gem 'minitest', require: false
 gem 'terminal-notifier-guard', require: false
 gem 'terminal-notifier', require: false
 gem 'mocha', require: false
+gem 'coveralls', require: false
 
 gem 'pry', require: false

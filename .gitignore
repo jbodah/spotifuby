@@ -2,3 +2,4 @@ server.log
 .spotifuby.yml
 .bundle
 vendor
+coverage
