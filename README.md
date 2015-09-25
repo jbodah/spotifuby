@@ -22,8 +22,12 @@ Spotifuby.
 # Start server
 rake start
 
-# Play track
-curl localhost:4567/play
+irb -Ilib
+> require 'spotifuby/client'
+> client = Spotifuby::Client.new('http://localhost:4567')
+> require 'spotifuby/bot'
+> bot = Spotifuby::Bot.create_default(client, $stdout)
+> bot.receive 'pause music'
 
 # Kill server
 rake stop
