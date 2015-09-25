@@ -32,6 +32,13 @@ module Spotify
       execute('player position').to_f
     end
 
+    # Enables shuffling of playlist.
+    # @param [Boolean] enabled Boolean indicating whether shuffling should be
+    #   enabled (true) or disabled (false).
+    def shuffle=(enabled)
+      execute "set shuffling to #{enabled}"
+    end
+
     # Set the volume of the player. Will use max volume if
     # given volume is too high
     # @param [Integer] v

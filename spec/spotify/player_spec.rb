@@ -144,6 +144,25 @@ module Spotify
       end
     end
 
+    describe '#shuffle=' do
+      before do
+        @executor = TestExecutor.new
+        @player = Spotify::Player.new(executor: @executor)
+      end
+
+      it 'tries to execute the set shuffling to true command' do
+        @player.shuffle = true
+        expected = "osascript -e 'tell application \"Spotify\" to set shuffling to true'"
+        assert_equal expected, @executor.received[0]
+      end
+
+      it 'tries to execute the set shuffling to false command' do
+        @player.shuffle = false
+        expected = "osascript -e 'tell application \"Spotify\" to set shuffling to false'"
+        assert_equal expected, @executor.received[0]
+      end
+    end
+
     describe '#volume=' do
       describe 'without max volume' do
         before do
