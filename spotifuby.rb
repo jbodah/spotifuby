@@ -53,6 +53,11 @@ post '/set_volume.json' do
   200
 end
 
+post '/set_shuffle.json' do
+  SPOTIFY.set_shuffle(@data.shuffle)
+  200
+end
+
 post '/enqueue.json' do
   SPOTIFY.enqueue_uri(@data.uri)
   200

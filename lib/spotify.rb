@@ -66,6 +66,10 @@ module Spotify
       player.volume = v
     end
 
+    def set_shuffle(enabled = true)
+      player.shuffle = enabled
+    end
+
     def track_duration
       player.track_duration
     end
