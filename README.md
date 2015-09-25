@@ -26,7 +26,7 @@ rake start
 curl localhost:4567/play
 
 # Kill server
-ps aux | grep spotifuby | grep -v grep | awk '{ print $2 }' | xargs kill
+rake stop
 ```
 
 The routes for Spotifuby is dynamically generated based on the
