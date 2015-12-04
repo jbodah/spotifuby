@@ -1,14 +1,14 @@
 desc 'Start public server'
 task :start do
-  puts "Starting spotifuby server on port 4567. Logging to server.log"
-  `nohup bundle exec rackup -o 0.0.0.0 >> server.log 2>&1 &`
+  puts "Starting spotifuby server. Logging to server.log"
+  `nohup bundle exec rackup >> server.log 2>&1 &`
 end
 
 desc 'Stop public server'
 task :stop do
   puts "Stopping spotifuby server."
   begin
-    `ps aux | grep spotifuby | grep -v grep | awk '{ print $2 }' | xargs kill`
+    `ps aux | grep rackup | grep -v grep | awk '{ print $2 }' | xargs kill`
   rescue SignalException
     # swallow
   end
