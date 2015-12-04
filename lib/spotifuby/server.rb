@@ -28,6 +28,20 @@ module Spotifuby
       erb :index
     end
 
+    %i{play next pause previous}.each do |action|
+      get "/#{action}" do
+        SPOTIFY.send(action)
+        @current_track = SPOTIFY.current_track
+        redirect to('/')
+      end
+    end
+
+    get '/set_volume' do
+      SPOTIFY.set_volume(Integer(@request.params['to']))
+      @current_track = SPOTIFY.current_track
+      redirect to('/')
+    end
+
     post '/play.json' do
       SPOTIFY.play(@data.uri)
       200
