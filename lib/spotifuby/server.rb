@@ -9,6 +9,7 @@ module Spotifuby
     SPOTIFY.logger = Logger.new($stdout).tap {|x| x.level = Logger::DEBUG}
 
     set server: :webrick
+    set views: File.expand_path('../../../views', __FILE__)
 
     Thread.abort_on_exception = true
 
