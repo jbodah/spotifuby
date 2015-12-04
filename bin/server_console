@@ -1,0 +1,56 @@
+#! /usr/bin/env ruby
+
+$: << 'lib'
+require 'bundler'
+Bundler.require(:default)
+
+require 'spotifuby/server'
+require 'pry'
+require 'cli_credentials'
+
+@spotify = Spotifuby::Spotify.create
+@player = Spotifuby::Spotify::Player.new
+
+$callbacks = Spotify::SessionCallbacks.new({
+  connectionstate_updated: proc do |session|
+    puts "New connection state: #{Spotify.session_connectionstate(session)}."
+  end,
+  music_delivery: proc do |session, format, frames, num_frames|
+    puts "More audio coming through!"
+  end,
+})
+
+config = {
+  api_version: Spotify::API_VERSION.to_i,
+  application_key: File.binread('spotify_appkey.key'),
+  cache_location: "",
+  user_agent: "spotify for ruby",
+  callbacks: $callbacks,
+}
+
+error, session = Spotify.session_create(config)
+raise Spotify::APIError.new(error) if error
+
+module SpotifyHelper
+  extend self
+
+  def register_session(session)
+    @session = session
+  end
+
+  def poll_until(idle: 0.2, timeout: 7)
+    Timeout::timeout(timeout) do
+      until yield
+        Spotify.session_process_events(@session)
+        sleep(idle)
+      end
+    end
+  end
+end
+
+creds = CLICredentials.for(title: 'Spotify')
+Spotify.try(:session_login, session, creds.username, creds.password, true, nil)
+
+SpotifyHelper.register_session(session)
+SpotifyHelper.poll_until { Spotify.session_connectionstate(session) == :logged_in }
+binding.pry
