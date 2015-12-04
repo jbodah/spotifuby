@@ -35,7 +35,12 @@ module Spotifuby
           all_songs.merge!(playlist.tracks_added_by)
         end
 
-        { name: all_songs[track_id].id }
+        listing = all_songs[track_id]
+        # default answer when current song is not on the playlist
+        return { name: 'Disco Stu' } if (listing.nil? || listing.empty?)
+
+        uid = listing.id
+        { name: RSpotify::User.find(uid).display_name || uid  }
       end
 
       private
