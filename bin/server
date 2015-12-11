@@ -1,0 +1,12 @@
+#! /usr/bin/env ruby
+
+$: << 'lib'
+require 'bundler'
+Bundler.require(:default)
+
+require 'spotifuby/server'
+require 'pry'
+
+@spotify = Spotifuby::Spotify.create
+@player = Spotifuby::Spotify::Player.new
+binding.pry
