@@ -3,6 +3,8 @@ source "https://rubygems.org"
 gem 'sinatra'
 gem 'rake'
 gem 'rspotify'
+gem 'spotify'
+gem 'cli_credentials'
 
 gem 'guard', require: false
 gem 'guard-minitest', require: false

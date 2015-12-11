@@ -1,0 +1,13 @@
+#! /usr/bin/env ruby
+
+$: << 'lib'
+require 'bundler'
+Bundler.require(:default)
+
+require 'spotifuby/client'
+require 'spotifuby/bot'
+require 'pry'
+
+@client = Spotifuby::Client.new('http://localhost:4567')
+@bot = Spotifuby::Bot.create_default(@client, $stdout)
+binding.pry
