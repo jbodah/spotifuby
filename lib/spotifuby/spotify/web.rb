@@ -37,7 +37,7 @@ module Spotifuby
 
         listing = all_songs[track_id]
         # default answer when current song is not on the playlist
-        return { name: 'Disco Stu' } if (listing.nil? || listing.empty?)
+        return nil if (listing.nil? || listing.empty?)
 
         uid = listing.id
         { name: RSpotify::User.find(uid).display_name || uid  }
