@@ -2,6 +2,7 @@ source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'rspotify'
+gem 'async_rb'
 gem 'rake', require: false
 
 gem 'pry', require: false

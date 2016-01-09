@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    async_rb (0.1.0)
     byebug (8.2.1)
     coderay (1.1.0)
     coveralls (0.8.10)
@@ -117,6 +118,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  async_rb
   byebug
   coveralls
   guard

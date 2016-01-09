@@ -1,10 +1,13 @@
 require 'spotifuby/spotify/async/event'
+require 'async/base'
 
 module Spotifuby
   module Spotify
     module Async
       # Async listener for listening for events from the Spotify instance
       class SongEventListener
+        include ::Async::Base
+
         def initialize(spotify, queue)
           @spotify          = spotify
           @queue            = queue
@@ -13,11 +16,6 @@ module Spotifuby
           @track_duration   = @spotify.track_duration
           @start_time       = Time.now
           @logger           = Spotifuby::Util::Logger
-        end
-
-        # Usage: listener.async(&:listen)
-        def async
-          Thread.new { instance_eval &Proc.new }
         end
 
         def listen
