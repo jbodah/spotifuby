@@ -8,6 +8,8 @@ module Spotifuby
           YAML.load_file(filepath).each do |k,v| 
             instance_variable_set "@#{k}", v 
           end
+        else
+          Spotifuby::Util::Logger.warn "Couldn't find .spotifuby.yml file"
         end
       end
     end
