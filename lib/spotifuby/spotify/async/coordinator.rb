@@ -1,16 +1,20 @@
-require 'spotifuby/spotify/async/song_event_listener'
 require 'spotifuby/spotify/async/event'
+require 'spotifuby/spotify/async/handler'
+require 'spotifuby/spotify/async/song_event_listener'
 
 module Spotifuby
   module Spotify
     module Async
+      # TODO: @jbodah 2016-01-09: flesh out
       class Coordinator
+        # TODO: @jbodah 2016-01-09: eww
+        attr_reader :event_queue
+
         def initialize(spotify)
           @spotify      = spotify
-          @song_queue   = Queue.new
           @event_queue  = Queue.new
-          @logger       = Spotifuby::Util::Logger
           @listener     = SongEventListener.new(@spotify, @event_queue)
+          @handler      = Handler.new(@spotify)
         end
 
         def run!
@@ -23,6 +27,11 @@ module Spotifuby
           @event_queue.enq(event)
         end
 
+        def ignore_next_song_change
+          event = Event.new(:ignore_next_song_change, nil)
+          @event_queue.enq(event)
+        end
+
         # TODO: @jbodah 2016-01-08: we still need to handle the case
         # when I have a song enqueued and
         # 1) I play a new song => I should play the new song and ignore song change
@@ -30,28 +39,21 @@ module Spotifuby
 
         def listen_for_events
           Thread.new do
+            # TODO: @jbodah 2016-01-09: encapsulate into handler actor
             loop do
-              event = @event_queue.deq
-              process_event(event)
+              cycle(wait: true)
             end
           end
         end
 
-        def process_event(event)
-          @logger.debug("Processing event #{event.object_id}: #{event}")
-          send("on_#{event.type}", event.body)
+        def cycle(wait: false)
+          return if !wait && @event_queue.empty?
+          event = @event_queue.deq
+          @handler.handle(event)
         end
 
-        def on_song_change(cause)
-          # TODO: @jbodah 2016-01-08: ignore event if paused
-          #return if @spotify.paused?
-          return if @song_queue.empty?
-          uri = @song_queue.deq
-          @spotify.play uri
-        end
-
-        def on_enqueue_song(uri)
-          @song_queue.enq(uri)
+        def flush
+          cycle until @event_queue.empty?
         end
       end
     end

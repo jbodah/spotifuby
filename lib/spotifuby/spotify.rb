@@ -29,18 +29,19 @@ module Spotifuby
 
       def play(uri = nil)
         if uri.nil?
-          @logger.debug "#{self}#play: Playing without URI"
+          @logger.debug "#{self.class}#play: No URI given, playing without URI"
           player.play
         else
           if @current_uri == uri
-            @logger.info "#{self}#play: Attempting to play the URI that's being played, doing nothing"
+            @logger.info "#{self.class}#play: Given URI is same as URI being played, doing nothing"
           else
             if uri == default_uri
-              @logger.debug "#{self}#play: Playing with default URI"
+              @logger.debug "#{self.class}#play: URI is default uir, playing default URI"
             else
-              @logger.debug "#{self}#play: Playing with URI #{uri}"
+              @logger.debug "#{self.class}#play: URI is new URI, playing URI #{uri}"
             end
             @current_uri = uri
+            async.ignore_next_song_change
             player.play(uri)
           end
         end

@@ -23,4 +23,4 @@ tags << 'focus'
 Minitest::Tagz.choose_tags(*tags, run_all_if_no_match: true)
 
 require 'spotifuby/util/logger'
-Spotifuby::Util::Logger.level = Logger::WARN
+Spotifuby::Util::Logger.set_level_from_string(ENV['LOG_LEVEL'] || 'warn')
