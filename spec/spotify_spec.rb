@@ -5,7 +5,6 @@ module Spotifuby
     describe 'private' do
       describe '#web' do
         before do
-          Spotify::Instance.any_instance.stubs(:config).returns({})
           @spotify = Spotify.create
         end
 

@@ -1,5 +1,3 @@
 require 'spotifuby/version'
 
-module Spotifuby
-
-end
+module Spotifuby; end

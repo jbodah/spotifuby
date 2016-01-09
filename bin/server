@@ -9,4 +9,7 @@ require 'pry'
 
 @spotify = Spotifuby::Spotify.create
 @player = Spotifuby::Spotify::Player.new
+@server = Spotifuby::Server
+@server.spotify = @spotify
+Thread.new { @server.run! }
 binding.pry

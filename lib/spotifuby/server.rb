@@ -1,118 +1,120 @@
 require 'sinatra/base'
 require 'json'
 require 'spotifuby/spotify'
-require 'spotifuby/hash_proxy'
+require 'spotifuby/util/hash_proxy'
 
 module Spotifuby
   class Server < Sinatra::Base
-    SPOTIFY = Spotify.create
-    SPOTIFY.logger = Logger.new($stdout).tap {|x| x.level = Logger::DEBUG}
-
     set server: :webrick
     set views: File.expand_path('../../../views', __FILE__)
 
     Thread.abort_on_exception = true
+
+    class << self
+      attr_accessor :spotify
+    end
+
+    def spotify
+      self.class.spotify ||= Spotify.create
+    end
 
     before do
       if @request.content_type == 'application/json' &&
         @request.request_method == 'POST'
         body = @request.body.read
         body = (body.nil? || body.empty?) ? {} : JSON.parse(body)
-        @data = HashProxy.new(body)
+        @data = Util::HashProxy.new(body)
       end
     end
 
-    # Web root
+    ### WEB
+
     get '/' do
-      @current_track = SPOTIFY.current_track
+      @current_track = spotify.current_track
       erb :index
     end
 
-    %i{play next pause previous}.each do |action|
+    %i(play next pause previous).each do |action|
       get "/#{action}" do
-        SPOTIFY.send(action)
-        @current_track = SPOTIFY.current_track
+        spotify.send(action)
+        @current_track = spotify.current_track
         redirect to('/')
       end
     end
 
     get '/set_volume' do
-      SPOTIFY.set_volume(Integer(@request.params['to']))
-      @current_track = SPOTIFY.current_track
+      spotify.set_volume(Integer(@request.params['to']))
+      @current_track = spotify.current_track
       redirect to('/')
     end
 
+    ### API
+
     post '/play.json' do
-      SPOTIFY.play(@data.uri)
+      spotify.play(@data.uri)
       200
     end
 
     post '/pause.json' do
-      SPOTIFY.pause
+      spotify.pause
       200
     end
 
     post '/next.json' do
-      SPOTIFY.next
+      spotify.next
       200
     end
 
     post '/previous.json' do
-      SPOTIFY.previous
+      spotify.previous
       200
     end
 
     post '/set_volume.json' do
-      SPOTIFY.set_volume(Integer(@data.volume))
+      spotify.set_volume(Integer(@data.volume))
       200
     end
 
     post '/set_shuffle.json' do
-      SPOTIFY.set_shuffle(@data.shuffle)
+      spotify.set_shuffle(@data.shuffle)
       200
     end
 
     post '/enqueue.json' do
-      SPOTIFY.enqueue_uri(@data.uri)
+      spotify.enqueue_uri(@data.uri)
       200
     end
 
     post '/set_default_uri.json' do
-      SPOTIFY.default_uri = @data.uri
+      spotify.default_uri = @data.uri
       200
     end
 
     post '/play_default_uri.json' do
-      SPOTIFY.play_default_uri
+      spotify.play_default_uri
       200
     end
 
     get '/current_track.json' do
-      SPOTIFY.current_track.to_json
-    end
-
-    get '/search_artist.json' do
-      SPOTIFY.search_artist(params[:q]).to_json
-    end
-
-    get '/search_album.json' do
-      SPOTIFY.search_album(params[:q]).to_json
-    end
-
-    get '/search_track.json' do
-      SPOTIFY.search_track(params[:q]).to_json
-    end
-
-    get '/albums_by_artist.json' do
-      SPOTIFY.albums_by_artist(params[:id]).to_json
-    end
-
-    get '/tracks_on_album.json' do
-      SPOTIFY.tracks_on_album(params[:id]).to_json
+      spotify.current_track.to_json
     end
 
     get '/who_added_track.json' do
-      SPOTIFY.who_added_track.to_json
+      spotify.who_added_track.to_json
+    end
+
+    # Search actions
+    %i(search_artist search_album search_track).each do |action|
+      get "/#{action}.json" do
+        spotify.public_send(action, params[:q]).to_json
+      end
+    end
+
+    # Relational actions
+    %i(albums_by_artist tracks_on_album).each do |action|
+      get "/#{action}.json" do
+        spotify.public_send(action, params[:id]).to_json
+      end
     end
   end
 end
