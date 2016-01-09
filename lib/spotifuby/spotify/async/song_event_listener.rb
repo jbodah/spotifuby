@@ -13,15 +13,13 @@ module Spotifuby
           @queue            = queue
           @initial_track    = @spotify.current_track
           @initial_position = @spotify.player_position
-          @track_duration   = @spotify.track_duration
-          @start_time       = Time.now
           @logger           = Spotifuby::Util::Logger
         end
 
         def listen
           loop do
             break if cycle
-            sleep 0.2
+            sleep 0.1
           end
           SongEventListener.new(@spotify, @queue).async(&:listen)
         end
@@ -41,8 +39,6 @@ module Spotifuby
             Event.new(:song_change, :track_changed)
           when player_postion_earlier_in_song?
             Event.new(:song_change, :player_postion_earlier_in_song)
-          when track_duration_elapsed? && !track_changed?
-            Event.new(:song_change, :track_duration_elapsed)
           end
         end
 
@@ -52,10 +48,6 @@ module Spotifuby
 
         def player_postion_earlier_in_song?
           @spotify.player_position < @initial_position
-        end
-
-        def track_duration_elapsed?
-          (Time.now - @start_time) > @track_duration
         end
       end
     end

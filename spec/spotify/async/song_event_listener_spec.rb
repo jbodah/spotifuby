@@ -31,16 +31,6 @@ module Spotifuby
             assert_equal Event.new(:song_change, :player_postion_earlier_in_song), 
                          @queue.shift
           end
-
-          it 'emits a song_changed event when the duration of the song has passed' do
-            @spotify.stubs(:track_duration).returns(300)
-            listener = SongEventListener.new(@spotify, @queue)
-
-            Timecop.freeze(Time.now + 400) do
-              listener.cycle
-              assert_equal Event.new(:song_change, :track_duration_elapsed), @queue.shift
-            end
-          end
         end
       end
     end

@@ -36,7 +36,7 @@ module Spotifuby
             @logger.info "#{self.class}#play: Given URI is same as URI being played, doing nothing"
           else
             if uri == default_uri
-              @logger.debug "#{self.class}#play: URI is default uir, playing default URI"
+              @logger.debug "#{self.class}#play: URI is default URI, playing default URI"
             else
               @logger.debug "#{self.class}#play: URI is new URI, playing URI #{uri}"
             end
@@ -56,6 +56,7 @@ module Spotifuby
       def track_duration;               player.track_duration; end
       def current_track;                player.currently_playing; end
       def pause;                        player.pause; end
+      def paused?;                      player.state == :paused; end
       def set_shuffle(enabled = true);  player.shuffle = enabled; end
 
       def enqueue_uri(uri);             async.enqueue(uri); end
