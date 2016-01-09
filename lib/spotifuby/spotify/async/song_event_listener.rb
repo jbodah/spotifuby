@@ -22,15 +22,15 @@ module Spotifuby
 
         def listen
           loop do
-            event = check_for_event
-            if event
-              publish_event(event)
-              break
-            else
-              sleep 0.2
-            end
+            break if cycle
+            sleep 0.2
           end
           SongEventListener.new(@spotify, @queue).async(&:listen)
+        end
+
+        def cycle
+          event = check_for_event
+          publish_event(event) if event
         end
 
         def publish_event(event)

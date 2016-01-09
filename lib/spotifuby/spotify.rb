@@ -9,7 +9,7 @@ module Spotifuby
   module Spotify
     class << self
       def create
-        Spotify::Instance.new
+        Spotify::Instance.new.tap(&:run!)
       end
     end
 
@@ -20,6 +20,10 @@ module Spotifuby
         @player = Player.new(max_volume: max_volume)
         @async  = Async::Coordinator.new(self)
         @logger = Spotifuby::Util::Logger
+      end
+
+      def run!
+        @async.run!
       end
 
       def play(uri = nil)

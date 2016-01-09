@@ -11,6 +11,9 @@ module Spotifuby
           @event_queue  = Queue.new
           @logger       = Spotifuby::Util::Logger
           @listener     = SongEventListener.new(@spotify, @event_queue)
+        end
+
+        def run!
           @listener.async(&:listen)
           listen_for_events
         end
