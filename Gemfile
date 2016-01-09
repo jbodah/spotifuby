@@ -16,4 +16,5 @@ group :test do
   gem 'spy_rb'
   gem 'timecop'
   gem 'minitest-tagz'
+  gem 'rack-test'
 end

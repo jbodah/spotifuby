@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'json'
 require 'spotifuby/spotify'
 require 'spotifuby/util/hash_proxy'
+require 'spotifuby/version'
 
 module Spotifuby
   class Server < Sinatra::Base
@@ -49,6 +50,12 @@ module Spotifuby
     end
 
     ### API
+
+    get '/info.json' do
+      {
+        version: Spotifuby::VERSION
+      }.to_json
+    end
 
     post '/play.json' do
       spotify.play(@data.uri)
