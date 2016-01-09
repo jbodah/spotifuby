@@ -2,7 +2,8 @@ require 'rspotify'
 require 'yaml'
 require 'spotifuby/spotify/player'
 require 'spotifuby/spotify/web'
-require 'spotifuby/spotify/async'
+require 'spotifuby/spotify/async/coordinator'
+require 'spotifuby/util/logger'
 
 module Spotifuby
   module Spotify
@@ -13,36 +14,26 @@ module Spotifuby
     end
 
     class Instance
-      attr_accessor :default_uri, :logger
+      attr_accessor :default_uri
 
       def initialize
         @player = Player.new(max_volume: max_volume)
-        @async  = Async.new(self)
-      end
-
-      def enqueue_uri(uri)
-        logger.debug("Enqueuing URI #{uri}") if logger
-        async.enqueue(uri)
-      end
-
-      def play_default_uri
-        play default_uri
+        @async  = Async::Coordinator.new(self)
+        @logger = Spotifuby::Util::Logger
       end
 
       def play(uri = nil)
         if uri.nil?
-          logger.debug('Playing without URI') if logger
+          @logger.debug "#{self}#play: Playing without URI"
           player.play
         else
           if @current_uri == uri
-            logger.info("Attempting to play the URI that's being played, doing nothing") if logger
+            @logger.info "#{self}#play: Attempting to play the URI that's being played, doing nothing"
           else
-            if logger
-              if uri == default_uri
-                logger.debug 'Playing with default URI'
-              else
-                logger.debug "Playing with URI #{uri}"
-              end
+            if uri == default_uri
+              @logger.debug "#{self}#play: Playing with default URI"
+            else
+              @logger.debug "#{self}#play: Playing with URI #{uri}"
             end
             @current_uri = uri
             player.play(uri)
@@ -50,40 +41,20 @@ module Spotifuby
         end
       end
 
-      def player_position
-        player.position
-      end
+      def play_default_uri;             play default_uri; end
 
-      def next
-        player.next_track
-        async.notify_skip
-      end
+      def player_position;              player.position; end
+      def next;                         player.next_track; end
+      def previous;                     player.previous_track; end
+      def set_volume(v);                player.volume = v; end
+      def track_duration;               player.track_duration; end
+      def current_track;                player.currently_playing; end
+      def pause;                        player.pause; end
+      def set_shuffle(enabled = true);  player.shuffle = enabled; end
 
-      def previous
-        player.previous_track
-      end
+      def enqueue_uri(uri);             async.enqueue(uri); end
 
-      def set_volume(v)
-        player.volume = v
-      end
-
-      def set_shuffle(enabled = true)
-        player.shuffle = enabled
-      end
-
-      def track_duration
-        player.track_duration
-      end
-
-      def current_track
-        player.currently_playing
-      end
-
-      def pause
-        player.pause
-      end
-
-      [:artist, :album, :track].each do |sym|
+      %i(artist album track).each do |sym|
         define_method "search_#{sym}" do |q|
           web.search(sym, q).map(&:to_hash)
         end
@@ -103,6 +74,8 @@ module Spotifuby
 
       private
 
+      attr_reader :player, :async
+
       def web
         Web.new(client_id, client_secret)
       end
@@ -111,32 +84,8 @@ module Spotifuby
         @config ||= YAML.load_file('.spotifuby.yml')
       end
 
-      def player
-        @player
-      end
-
-      def async
-        @async
-      end
-
-      def client_id
-        config[:client_id]
-      end
-
-      def client_secret
-        config[:client_secret]
-      end
-
-      def default_uri
-        config[:default_uri]
-      end
-
-      def max_volume
-        config[:max_volume]
-      end
-
-      def default_user
-        config[:default_user]
+      %i(client_id client_secret default_uri max_volume default_user).each do |sym|
+        define_method(sym) { config[sym] }
       end
     end
   end

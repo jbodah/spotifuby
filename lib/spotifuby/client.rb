@@ -1,6 +1,7 @@
 require 'faraday'
 require 'json'
 require 'spotifuby/client/faraday_middleware'
+require 'spotifuby/util/logger'
 
 module Spotifuby
   class Client

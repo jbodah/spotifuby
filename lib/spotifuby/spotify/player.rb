@@ -1,6 +1,9 @@
 module Spotifuby
   module Spotify
-    # Responsible for managing interactions with Spotify instance
+    # Responsible for managing interactions with Spotify process
+    # Encapsulates the application state of the player as well as
+    # any hack we need to build on top of the player to make it
+    # "nice"
     class Player
       def initialize(max_volume: 100, executor: ShellExecutor)
         @max_volume = max_volume || 100
@@ -17,29 +20,6 @@ module Spotifuby
         execute 'pause'
       end
 
-      # Skip to next song
-      def next_track
-        execute 'next track'
-      end
-
-      # Rewind the current song or skip to previous song
-      def previous_track
-        execute 'previous track'
-      end
-
-      # How far the current track is in the song
-      # @return [Float]
-      def position
-        execute('player position').to_f
-      end
-
-      # Enables shuffling of playlist.
-      # @param [Boolean] enabled Boolean indicating whether shuffling should be
-      #   enabled (true) or disabled (false).
-      def shuffle=(enabled)
-        execute "set shuffling to #{enabled}"
-      end
-
       # Set the volume of the player. Will use max volume if
       # given volume is too high
       # @param [Integer] v
@@ -48,17 +28,6 @@ module Spotifuby
         execute "set sound volume to #{v}"
       end
 
-      def track_duration
-        execute('duration of current track').chomp.to_i
-      end
-
-      # Returns the state of the player
-      # @return [Symbol] :playing, :paused, :stopped
-      def state
-        execute('player state').to_sym
-      end
-
-      # Returns a hash on whats currently playing
       # @return [Hash] with :name, :artist, :album
       def currently_playing
         {
@@ -68,21 +37,26 @@ module Spotifuby
         }
       end
 
-      def current_track
-        execute 'name of current track as string'
-      end
+      def next_track;         execute 'next track'; end
 
-      def current_track_id
-        execute 'id of current track as string'
-      end
+      # Rewind the current song or skip to previous song
+      def previous_track;     execute 'previous track'; end
 
-      def current_artist
-        execute 'artist of current track as string'
-      end
+      # How far the current track is in the song
+      def position;           execute('player position').to_f; end
 
-      def current_album
-        execute 'album of current track as string'
-      end
+      # @param [Boolean]
+      def shuffle=(enabled);  execute "set shuffling to #{enabled}"; end
+
+      def track_duration;     execute('duration of current track').chomp.to_i; end
+
+      # @return [Symbol] :playing, :paused, :stopped
+      def state;              execute('player state').to_sym; end
+
+      def current_track;      execute 'name of current track as string'; end
+      def current_track_id;   execute 'id of current track as string'; end
+      def current_artist;     execute 'artist of current track as string'; end
+      def current_album;      execute 'album of current track as string'; end
 
       private
 
