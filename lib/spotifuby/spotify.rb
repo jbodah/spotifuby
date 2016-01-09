@@ -1,5 +1,6 @@
 require 'rspotify'
 require 'yaml'
+require 'spotifuby/spotify/configuration'
 require 'spotifuby/spotify/player'
 require 'spotifuby/spotify/web'
 require 'spotifuby/spotify/async/coordinator'
@@ -85,11 +86,12 @@ module Spotifuby
       end
 
       def config
-        @config ||= YAML.load_file('.spotifuby.yml')
+        @config ||= Configuration.new
       end
 
+      # Config delegation
       %i(client_id client_secret default_uri max_volume default_user).each do |sym|
-        define_method(sym) { config[sym] }
+        define_method(sym) { config.public_send(sym) }
       end
     end
   end

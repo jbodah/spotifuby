@@ -5,7 +5,7 @@ module Spotifuby
   module Spotify
     module Async
       class SongEventListenerSpec < Minitest::Spec
-        describe '#check_for_and_publish_event' do
+        describe '#cycle' do
           before do
             @spotify = Spotify::Instance.new
             @queue = []
