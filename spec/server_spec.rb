@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'spotifuby/server'
+require 'spotifuby/spotify/search_result'
 require 'rack/test'
 
 class ServerSpec < Minitest::Spec
@@ -19,7 +20,7 @@ class ServerSpec < Minitest::Spec
     assert_equal 200, last_response.status
   end
 
-  def get(endpoint)
+  def get(endpoint, *args)
     super.tap do |x|
       @body = JSON.parse(last_response.body) if endpoint[/json$/]
     end
@@ -69,6 +70,18 @@ class ServerSpec < Minitest::Spec
 
       get '/queue.json'
       assert_equal [enqueued_uri], @body['queue']
+    end
+  end
+
+  describe 'GET /search_category.json' do
+    it 'returns the search results of the match' do
+      search_results = 2.times.map { Spotifuby::Spotify::SearchResult.new }
+      Spotifuby::Spotify::Web.any_instance
+                             .stubs(:list_categories)
+                             .returns({ "Reggae Hits" => search_results })
+
+      get '/search_category.json', q: 'reggae'
+      assert_equal search_results.map(&:to_hash), @body
     end
   end
 end

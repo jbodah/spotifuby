@@ -68,6 +68,10 @@ module Spotifuby
         end
       end
 
+      def search_category(q)
+        web.search_category(q).map(&:to_hash)
+      end
+
       def albums_by_artist(id)
         web.albums_by_artist(id).map(&:to_hash)
       end

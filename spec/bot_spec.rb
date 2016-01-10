@@ -142,27 +142,46 @@ module Spotifuby
     end
 
     describe 'play me some' do
-      it 'gets to /search_artist with joe buddy on play me some joe buddy' do
-        @bot.receive 'play me some joe buddy'
-        assert_requested get: 'search_artist', q: 'joe buddy'
+      it 'gets to /search_category with reggae' do
+        @bot.receive 'play me some reggae'
+        assert_requested get: 'search_genre', q: 'reggae'
       end
 
-      it 'gets to /search_artist then posts the uri to /play' do
+      it 'gets to /search_category then posts the uri to /play' do
         @net.stubs(:get).returns(uri: 12345)
-        @bot.receive 'play me some joe buddy'
+        @bot.receive 'play me some reggae'
         assert_requested post: 'play', uri: 12345
       end
     end
 
     describe 'enqueue me some' do
-      it 'gets to /search_artist with joe buddy on enqueue me some joe buddy' do
-        @bot.receive 'enqueue me some joe buddy'
+      it '' do
+        fail
+      end
+    end
+
+    describe 'play me something by' do
+      it 'gets to /search_artist with joe buddy' do
+        @bot.receive 'play me something by joe buddy'
+        assert_requested get: 'search_artist', q: 'joe buddy'
+      end
+
+      it 'gets to /search_artist then posts the uri to /play' do
+        @net.stubs(:get).returns(uri: 12345)
+        @bot.receive 'play me something by joe buddy'
+        assert_requested post: 'play', uri: 12345
+      end
+    end
+
+    describe 'enqueue me something by' do
+      it 'gets to /search_artist with joe buddy' do
+        @bot.receive 'enqueue me something by joe buddy'
         assert_requested get: 'search_artist', q: 'joe buddy'
       end
 
       it 'gets to /search_artist then posts the uri to /enqueue' do
         @net.stubs(:get).returns(uri: 12345)
-        @bot.receive 'enqueue me some joe buddy'
+        @bot.receive 'enqueue me something by joe buddy'
         assert_requested post: 'enqueue', uri: 12345
       end
     end

@@ -119,6 +119,10 @@ module Spotifuby
       end
     end
 
+    get '/search_category.json' do
+      spotify.search_category(params[:q]).to_json
+    end
+
     # Relational actions
     %i(albums_by_artist tracks_on_album).each do |action|
       get "/#{action}.json" do
