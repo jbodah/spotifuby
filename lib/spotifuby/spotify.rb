@@ -60,6 +60,7 @@ module Spotifuby
       def set_shuffle(enabled = true);  player.shuffle = enabled; end
 
       def enqueue_uri(uri);             async.enqueue(uri); end
+      def dump_queue;                   async.dump_queue; end
 
       %i(artist album track).each do |sym|
         define_method "search_#{sym}" do |q|

@@ -52,6 +52,18 @@ class FunctionalSpec < Minitest::Spec
           end
         end
       end
+
+      describe 'and then I call dump_queue' do
+        it 'should return the queue as a string' do
+          assert_equal [@enqueued_uri], @spotify.dump_queue
+        end
+
+        it 'returns a dup of the queue' do
+          queue = @spotify.dump_queue
+          queue.enq 'hello'
+          assert_equal [@enqueued_uri], @spotify.dump_queue
+        end
+      end
     end
 
     describe 'given the song queue is empty' do

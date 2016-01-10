@@ -52,9 +52,11 @@ module Spotifuby
     ### API
 
     get '/info.json' do
-      {
-        version: Spotifuby::VERSION
-      }.to_json
+      { version: Spotifuby::VERSION }.to_json
+    end
+
+    get '/queue.json' do
+      { queue: spotify.dump_queue }.to_json
     end
 
     post '/play.json' do

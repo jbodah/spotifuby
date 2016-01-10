@@ -32,6 +32,10 @@ module Spotifuby
           @event_queue.enq(event)
         end
 
+        def dump_queue
+          @handler.song_queue.dup
+        end
+
         # TODO: @jbodah 2016-01-08: we still need to handle the case
         # when I have a song enqueued and
         # 1) I play a new song => I should play the new song and ignore song change

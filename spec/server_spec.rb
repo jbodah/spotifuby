@@ -19,11 +19,16 @@ class ServerSpec < Minitest::Spec
     assert_equal 200, last_response.status
   end
 
+  def get(endpoint)
+    super.tap do |x|
+      @body = JSON.parse(last_response.body) if endpoint[/json$/]
+    end
+  end
+
   describe 'GET /info.json' do
     it 'returns the application version' do
       get '/info.json'
-      body = JSON.parse(last_response.body)
-      assert_equal Spotifuby::VERSION, body['version']
+      assert_equal Spotifuby::VERSION, @body['version']
     end
   end
 
@@ -53,6 +58,17 @@ class ServerSpec < Minitest::Spec
         post "/#{action}.json"
         assert_200
       end
+    end
+  end
+
+  describe 'GET /queue.json' do
+    it 'should return the queue in the body of the response' do
+      enqueued_uri = '12345'
+      @spotify.enqueue_uri(enqueued_uri)
+      @spotify.send(:async).flush
+
+      get '/queue.json'
+      assert_equal [enqueued_uri], @body['queue']
     end
   end
 end

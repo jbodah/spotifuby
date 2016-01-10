@@ -1,11 +1,17 @@
+require 'spotifuby/spotify/async/song_queue'
+
 module Spotifuby
   module Spotify
     module Async
       class Handler
         def initialize(spotify)
           @spotify = spotify
-          @song_queue = Queue.new
+          @song_queue = SongQueue.new
           @logger = Spotifuby::Util::Logger
+        end
+
+        def song_queue
+          @song_queue.facade
         end
 
         def handle(event)
