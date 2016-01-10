@@ -54,7 +54,7 @@ Status - #{is_up ? 'up' : 'down'}
                 spotifuby.public_send("post_#{action}", uri: uri)
               end
 
-              on /#{action} me some (.*)/, help: "#{action} me some <ARTIST_NAME> - #{action.to_s.capitalize} artist based on seach query" do |artist|
+              on /#{action} me something by (.*)/, help: "#{action} me something by <ARTIST_NAME> - #{action.to_s.capitalize} artist based on seach query" do |artist|
                 res = spotifuby.get_search_artist(q: artist)
                 spotifuby.public_send("post_#{action}", uri: res[:uri]) if res
               end
