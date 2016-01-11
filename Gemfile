@@ -1,8 +1,13 @@
 source 'https://rubygems.org'
 
-gem 'sinatra'
-gem 'rspotify'
-gem 'async_rb'
+group :server do
+  gem 'sinatra'
+  gem 'rspotify'
+  gem 'async_rb'
+end
+
+gem 'faraday'
+
 gem 'rake', require: false
 
 gem 'pry', require: false

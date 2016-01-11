@@ -1,3 +1,5 @@
+require 'logger'
+
 module Spotifuby
   module Util
     Logger = Logger.new($stdout)

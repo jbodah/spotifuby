@@ -121,6 +121,7 @@ DEPENDENCIES
   async_rb
   byebug
   coveralls
+  faraday
   guard
   guard-minitest
   minitest

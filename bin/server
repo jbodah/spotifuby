@@ -2,7 +2,7 @@
 
 $: << 'lib'
 require 'bundler'
-Bundler.require(:default)
+Bundler.require(:default, :server)
 
 require 'spotifuby/server'
 require 'pry'
