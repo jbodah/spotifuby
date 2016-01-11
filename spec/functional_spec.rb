@@ -68,8 +68,16 @@ class FunctionalSpec < Minitest::Spec
 
     describe 'given the song queue is empty' do
       describe 'on a song change' do
-        it 'should not call play' do
-          @spotify.expects(:play).never
+        it 'should play the default uri' do
+          @spotify.expects(:play_default_uri).once
+          event = Spotifuby::Spotify::Async::Event.new(:song_change, :testing)
+          @spotify.send(:async).event_queue.enq(event)
+          @spotify.send(:async).flush
+        end
+
+        it 'should not call play on the player if the default uri is already playing' do
+          @spotify.play_default_uri
+          @spotify.send(:player).expects(:play).never
           event = Spotifuby::Spotify::Async::Event.new(:song_change, :testing)
           @spotify.send(:async).event_queue.enq(event)
           @spotify.send(:async).flush

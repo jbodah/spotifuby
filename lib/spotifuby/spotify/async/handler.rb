@@ -27,14 +27,13 @@ module Spotifuby
           # Handle case where we enqueue a track (which will stop playing when done) 
           # and then the queue is empty. We want to continue playing with the default
           # uri
-          if @spotify.paused?
+          #
+          # Play default URI if queue is empty (it will ignore you if you try to play
+          # something that is playing)
+          if @spotify.paused? || @song_queue.empty?
             @spotify.play_default_uri
             return
           end
-
-          # We always listen for song change events, so just ignore
-          # events when we don't have anything enqueued
-          return if @song_queue.empty?
           
           # Happens when we want to play a specific uri and we have a song queue
           # Let the specific uri cut the line
