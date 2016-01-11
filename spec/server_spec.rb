@@ -35,7 +35,7 @@ class ServerSpec < Minitest::Spec
   describe 'POST /play.json' do
     describe 'with no URI' do
       it 'calls play with no URI and returns a 200' do
-        @spotify.expects(:play).with(nil).once
+        @spotify.expects(:play).with(nil, cut_queue: true).once
         post '/play.json', nil, 'CONTENT_TYPE' => 'application/json'
         assert_200
       end
@@ -44,7 +44,7 @@ class ServerSpec < Minitest::Spec
     describe 'with a URI in the body' do
       it 'calls play with the URI and returns a 200 ' do
         uri = '12345'
-        @spotify.expects(:play).with(uri).once
+        @spotify.expects(:play).with(uri, cut_queue: true).once
         post '/play.json', { uri: uri }.to_json, 'CONTENT_TYPE' => 'application/json'
         assert_200
       end

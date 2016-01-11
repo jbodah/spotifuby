@@ -60,7 +60,7 @@ module Spotifuby
     end
 
     post '/play.json' do
-      spotify.play(@data.uri)
+      spotify.play(@data.uri, cut_queue: true)
       200
     end
 

@@ -15,12 +15,30 @@ class FunctionalSpec < Minitest::Spec
         @spotify.send(:async).flush
       end
 
-      describe 'and then I play a given a song' do
+      describe 'and I enqueue another song' do
+        before do 
+          @second_enqueued_uri = '23456'
+          @spotify.enqueue_uri(@second_enqueued_uri)
+          @spotify.send(:async).flush
+        end
+
+        it 'should play both songs in succession when the tracks change' do
+          @spotify.send(:player).expects(:play).with(@enqueued_uri).once
+          event = Spotifuby::Spotify::Async::Event.new(:song_change, :testing)
+          @spotify.send(:async).event_queue.enq(event)
+          @spotify.send(:async).flush
+          @spotify.send(:async).event_queue.enq(event)
+          @spotify.send(:player).expects(:play).with(@second_enqueued_uri).once
+          @spotify.send(:async).flush
+        end
+      end
+
+      describe 'and then I play a given a song with cutting the queue' do
         it 'should play the given song' do
           @given_uri = '90876'
           @spotify.send(:player).expects(:play).once.with(@given_uri)
 
-          @spotify.play(@given_uri)
+          @spotify.play(@given_uri, cut_queue: true)
           @spotify.send(:async).flush
 
           event = Spotifuby::Spotify::Async::Event.new(:song_change, :testing)
@@ -31,7 +49,7 @@ class FunctionalSpec < Minitest::Spec
 
       describe 'and that song plays and finishes' do
         before do
-          # Play the enqueued song
+          # Play the enqueued song should cause the player to play
           @spotify.send(:player).expects(:play).once.with(@enqueued_uri)
           event = Spotifuby::Spotify::Async::Event.new(:song_change, :testing)
           @spotify.send(:async).event_queue.enq(event)
@@ -39,13 +57,9 @@ class FunctionalSpec < Minitest::Spec
         end
 
         describe 'and it was the last song in the queue causing the player to pause' do
-          before do
-            @spotify.stubs(:paused?).returns(true)
-          end
-
           it 'should play the default uri on the song change' do
+            assert @spotify.send(:async).instance_variable_get(:@handler).instance_variable_get(:@song_queue).empty?
             @spotify.expects(:play_default_uri).once
-
             event = Spotifuby::Spotify::Async::Event.new(:song_change, :testing)
             @spotify.send(:async).event_queue.enq(event)
             @spotify.send(:async).flush

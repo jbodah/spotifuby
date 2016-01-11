@@ -27,7 +27,7 @@ module Spotifuby
         @async.run!
       end
 
-      def play(uri = nil)
+      def play(uri = nil, cut_queue: false)
         if uri.nil?
           @logger.debug "#{self.class}#play: No URI given, playing without URI"
           player.play
@@ -41,7 +41,7 @@ module Spotifuby
               @logger.debug "#{self.class}#play: URI is new URI, playing URI #{uri}"
             end
             @current_uri = uri
-            async.ignore_next_song_change
+            async.cut_queue if cut_queue
             player.play(uri)
           end
         end

@@ -27,8 +27,8 @@ module Spotifuby
           @event_queue.enq(event)
         end
 
-        def ignore_next_song_change
-          event = Event.new(:ignore_next_song_change, nil)
+        def cut_queue
+          event = Event.new(:queue_being_cut, nil)
           @event_queue.enq(event)
         end
 
