@@ -24,3 +24,7 @@ Minitest::Tagz.choose_tags(*tags, run_all_if_no_match: true)
 
 require 'spotifuby/util/logger'
 Spotifuby::Util::Logger.set_level_from_string(ENV['LOG_LEVEL'] || 'warn')
+
+require 'spotifuby/spotify/player'
+# TODO: @jbodah 2016-01-11: move this
+Spotifuby::Spotify::ShellExecutor.define_singleton_method(:call) {|*args|}
