@@ -56,12 +56,20 @@ Status - #{is_up ? 'up' : 'down'}
 
               on /#{action} me some (.*)/, help: "#{action} me some <ARTIST_NAME> - #{action.to_s.capitalize} artist based on seach query" do |artist|
                 res = spotifuby.get_search_artist(q: artist)
-                spotifuby.public_send("post_#{action}", uri: res[:uri]) if res
+                if res && res.body
+                  results = JSON.parse(res.body)
+                  result = results.first
+                  spotifuby.public_send("post_#{action}", uri: result['uri']) if result
+                end
               end
 
               on /#{action} track (.*)/, help: "#{action} track <TRACK_NAME> - #{action.to_s.capitalize} track based on seach query" do |track|
                 res = spotifuby.get_search_track(q: track)
-                spotifuby.public_send("post_#{action}", uri: res[:uri]) if res
+                if res && res.body
+                  results = JSON.parse(res.body)
+                  result = results.first
+                  spotifuby.public_send("post_#{action}", uri: result['uri']) if result
+                end
               end
             end
 

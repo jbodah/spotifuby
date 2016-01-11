@@ -148,7 +148,8 @@ module Spotifuby
       end
 
       it 'gets to /search_artist then posts the uri to /play' do
-        @net.stubs(:get).returns(uri: 12345)
+        res = Rack::MockResponse.new(200, [], [{ uri: 12345 }].to_json)
+        @net.stubs(:get).returns(res)
         @bot.receive 'play me some joe buddy'
         assert_requested post: 'play', uri: 12345
       end
@@ -161,7 +162,8 @@ module Spotifuby
       end
 
       it 'gets to /search_artist then posts the uri to /enqueue' do
-        @net.stubs(:get).returns(uri: 12345)
+        res = Rack::MockResponse.new(200, [], [{ uri: 12345 }].to_json)
+        @net.stubs(:get).returns(res)
         @bot.receive 'enqueue me some joe buddy'
         assert_requested post: 'enqueue', uri: 12345
       end
@@ -174,7 +176,8 @@ module Spotifuby
       end
 
       it 'gets to /search_track then posts the uri to /enqueue' do
-        @net.stubs(:get).returns(uri: 12345)
+        res = Rack::MockResponse.new(200, [], [{ uri: 12345 }].to_json)
+        @net.stubs(:get).returns(res)
         @bot.receive 'enqueue track yo dawg'
         assert_requested post: 'enqueue', uri: 12345
       end
@@ -187,7 +190,8 @@ module Spotifuby
       end
 
       it 'gets to /search_track then posts the uri to /play' do
-        @net.stubs(:get).returns(uri: 12345)
+        res = Rack::MockResponse.new(200, [], [{ uri: 12345 }].to_json)
+        @net.stubs(:get).returns(res)
         @bot.receive 'play track yo dawg'
         assert_requested post: 'play', uri: 12345
       end
