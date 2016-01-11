@@ -51,7 +51,7 @@ class ServerSpec < Minitest::Spec
     end
   end
 
-  %i(pause next previous play_default_uri).each do |action|
+  %i(pause previous play_default_uri).each do |action|
     describe "POST /#{action}.json" do
       it "calls #{action} and returns a 200" do
         @spotify.expects(action).once
@@ -69,6 +69,38 @@ class ServerSpec < Minitest::Spec
 
       get '/queue.json'
       assert_equal [enqueued_uri], @body['queue']
+    end
+  end
+
+  describe 'POST /next.json' do
+    it 'calls next and returns a 200' do
+      @spotify.expects(:next).once
+      post '/next.json'
+      assert_200
+    end
+
+    it 'increments the skip count' do
+      current_track = {
+        name:   'The Thrill Is Gone',
+        artist: 'B.B. King',
+        album:  'Greatest Hits'
+      }
+      @spotify.stubs(:current_track).returns(current_track)
+      @spotify.send(:stats).expects(:increment_skip_count).with(current_track)
+    end
+  end
+
+  describe 'GET /song_stats.json' do
+    it 'returns the skip counts for every skipped song' do
+      current_track = {
+        name:   'All Along The Watchtowers',
+        artist: 'Jimi Hendrix',
+        album:  'Greatest Hits'
+      }
+      @spotify.send(:stats).increment_skip_count(current_track)
+      @spotify.send(:stats).increment_skip_count(current_track)
+      get '/song_stats.json'
+      assert_equal 2, @body[current_track]
     end
   end
 end
