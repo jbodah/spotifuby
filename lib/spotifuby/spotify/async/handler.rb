@@ -19,16 +19,29 @@ module Spotifuby
           send("on_#{event.type}", event.body)
         end
 
+        def on_initiate_play_ban
+          @play_ban = true
+        end
+
+        def on_remove_play_ban
+          @play_ban = false
+        end
+
         def on_queue_being_cut(_)
-          @ignore_next_song_change = true unless @song_queue.empty?
+          @ignore_next_song_change = true
         end
 
         def on_song_change(cause)
-          #require 'rubygems'; require 'pry'; binding.pry
+          # Make sure no song changes happen when we purposely pause the player
+          if @play_ban
+            @logger.debug "Play ban, ignoring song change"
+            return
+          end
+
           # Happens when we want to play a specific uri and we have a song queue
           # Let the specific uri cut the line
           if @ignore_next_song_change
-            @logger.debug "Ignore flag set, ignoring song change"
+            @logger.debug "Flag set, ignoring song change"
             @ignore_next_song_change = false
             return
           end
@@ -39,8 +52,7 @@ module Spotifuby
           #
           # Play default URI if queue is empty (it will ignore you if you try to play
           # something that is playing)
-          if @spotify.paused? || @song_queue.empty?
-            @logger.debug "Player paused, playing default URI" if @spotify.paused?
+          if @song_queue.empty?
             @logger.debug "Song queue empty, playing default URI" if @song_queue.empty?
             @spotify.play_default_uri
             return
@@ -48,7 +60,7 @@ module Spotifuby
 
           @logger.debug "Dequeuing queued song and playing it"
           uri = @song_queue.deq
-          @spotify.play uri
+          @spotify.play(uri, cut_queue: true)
         end
 
         def on_enqueue_song(uri)

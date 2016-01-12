@@ -22,6 +22,16 @@ module Spotifuby
           listen_for_events
         end
 
+        def initiate_play_ban
+          event = Event.new(:initiate_play_ban, nil)
+          @event_queue.enq(event)
+        end
+
+        def remove_play_ban
+          event = Event.new(:remove_play_ban, nil)
+          @event_queue.enq(event)
+        end
+
         def enqueue(uri)
           event = Event.new(:enqueue_song, uri)
           @event_queue.enq(event)

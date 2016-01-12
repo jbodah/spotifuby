@@ -60,12 +60,12 @@ module Spotifuby
     end
 
     post '/play.json' do
-      spotify.play(@data.uri, cut_queue: true)
+      spotify.play(@data.uri, cut_queue: true, user_initiated: true)
       200
     end
 
     post '/pause.json' do
-      spotify.pause
+      spotify.pause(user_intitiated: true)
       200
     end
 

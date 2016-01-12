@@ -27,12 +27,12 @@ module Spotifuby
         @async.run!
       end
 
-      def play(uri = nil, cut_queue: false)
+      def play(uri = nil, cut_queue: false, user_initiated: false)
         if uri.nil?
           @logger.debug "#{self.class}#play: No URI given, playing without URI"
           player.play
         else
-          if @current_uri == uri
+          if @current_uri == uri && @current_uri == default_uri
             @logger.info "#{self.class}#play: Given URI is same as URI being played, doing nothing"
           else
             if uri == default_uri
@@ -41,10 +41,17 @@ module Spotifuby
               @logger.debug "#{self.class}#play: URI is new URI, playing URI #{uri}"
             end
             @current_uri = uri
+            async.remove_play_ban if user_initiated
             async.cut_queue if cut_queue
             player.play(uri)
           end
         end
+      end
+
+      def pause(user_initiated: false)
+        # TODO: @jbodah 2016-01-11: test
+        async.initiate_play_ban if user_initiated
+        player.pause
       end
 
       def play_default_uri;             play default_uri; end
@@ -55,7 +62,6 @@ module Spotifuby
       def set_volume(v);                player.volume = v; end
       def track_duration;               player.track_duration; end
       def current_track;                player.currently_playing; end
-      def pause;                        player.pause; end
       def paused?;                      player.state == :paused; end
       def set_shuffle(enabled = true);  player.shuffle = enabled; end
 

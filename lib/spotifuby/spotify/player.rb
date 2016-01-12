@@ -48,7 +48,7 @@ module Spotifuby
       # @param [Boolean]
       def shuffle=(enabled);  execute "set shuffling to #{enabled}"; end
 
-      def track_duration;     execute('duration of current track').chomp.to_i; end
+      def track_duration;     execute('duration of current track').chomp.to_i.to_f/1000; end
 
       # @return [Symbol] :playing, :paused, :stopped
       def state;              execute('player state').to_sym; end
@@ -57,6 +57,7 @@ module Spotifuby
       def current_track_id;   execute 'id of current track as string'; end
       def current_artist;     execute 'artist of current track as string'; end
       def current_album;      execute 'album of current track as string'; end
+      def current_uri;        execute 'spotify:track:6RphjcLJnv7ah1MV1rmvMb'; end
 
       private
 

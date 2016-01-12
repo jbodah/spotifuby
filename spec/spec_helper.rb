@@ -28,3 +28,4 @@ Spotifuby::Util::Logger.set_level_from_string(ENV['LOG_LEVEL'] || 'warn')
 require 'spotifuby/spotify/player'
 # TODO: @jbodah 2016-01-11: move this
 Spotifuby::Spotify::ShellExecutor.define_singleton_method(:call) {|*args|}
+Spotifuby::Spotify::Player.send(:define_method, :track_duration) { 10 }
