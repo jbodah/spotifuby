@@ -21,7 +21,7 @@ module Spotifuby
         def listen
           loop do
             break if cycle
-            sleep 0.05
+            sleep 0.1
           end
           SongEventListener.new(@spotify, @queue).async(&:listen)
         end
