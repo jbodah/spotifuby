@@ -104,6 +104,11 @@ module Spotifuby
       200
     end
 
+    post '/drop_queue.json' do
+      spotify.drop_queue
+      200
+    end
+
     get '/current_track.json' do
       spotify.current_track.to_json
     end

@@ -71,4 +71,12 @@ class ServerSpec < Minitest::Spec
       assert_equal [enqueued_uri], @body['queue']
     end
   end
+
+  describe 'POST /drop_queue.json' do
+    it 'calls spotify.drop_queue and returns a 200' do
+      @spotify.expects(:drop_queue).once
+      post '/drop_queue.json'
+      assert_200
+    end
+  end
 end

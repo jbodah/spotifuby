@@ -31,6 +31,10 @@ module Spotifuby
           @ignore_next_song_change = true
         end
 
+        def on_drop_song_queue(_)
+          @song_queue = SongQueue.new
+        end
+
         def on_song_change(cause)
           # Make sure no song changes happen when we purposely pause the player
           if @play_ban

@@ -22,25 +22,11 @@ module Spotifuby
           listen_for_events
         end
 
-        def initiate_play_ban
-          event = Event.new(:initiate_play_ban, nil)
-          @event_queue.enq(event)
-        end
-
-        def remove_play_ban
-          event = Event.new(:remove_play_ban, nil)
-          @event_queue.enq(event)
-        end
-
-        def enqueue(uri)
-          event = Event.new(:enqueue_song, uri)
-          @event_queue.enq(event)
-        end
-
-        def cut_queue
-          event = Event.new(:queue_being_cut, nil)
-          @event_queue.enq(event)
-        end
+        def initiate_play_ban;  emit(:initiate_play_ban); end
+        def remove_play_ban;    emit(:remove_play_ban); end
+        def cut_queue;          emit(:queue_being_cut); end
+        def drop_queue;         emit(:drop_song_queue); end
+        def enqueue(uri);       emit(:enqueue_song, uri); end
 
         def dump_queue
           @handler.song_queue.dup
@@ -54,9 +40,7 @@ module Spotifuby
         def listen_for_events
           Thread.new do
             # TODO: @jbodah 2016-01-09: encapsulate into handler actor
-            loop do
-              cycle(wait: true)
-            end
+            loop { cycle(wait: true) }
           end
         end
 
@@ -68,6 +52,13 @@ module Spotifuby
 
         def flush
           cycle until @event_queue.empty?
+        end
+
+        private
+
+        def emit(type, payload = nil)
+          event = Event.new(type, payload)
+          @event_queue.enq(event)
         end
       end
     end
