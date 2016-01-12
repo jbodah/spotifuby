@@ -28,23 +28,22 @@ module Spotifuby
       end
 
       def play(uri = nil, cut_queue: false, user_initiated: false)
-        if uri.nil?
+        case
+        when uri.nil?
           @logger.debug "#{self.class}#play: No URI given, playing without URI"
           player.play
+        when @current_uri == uri && @current_uri == default_uri
+          @logger.debug "#{self.class}#play: Given default URI which is already being played, doing nothing"
         else
-          if @current_uri == uri && @current_uri == default_uri
-            @logger.info "#{self.class}#play: Given URI is same as URI being played, doing nothing"
+          if uri == default_uri
+            @logger.debug "#{self.class}#play: URI is default URI, playing default URI"
           else
-            if uri == default_uri
-              @logger.debug "#{self.class}#play: URI is default URI, playing default URI"
-            else
-              @logger.debug "#{self.class}#play: URI is new URI, playing URI #{uri}"
-            end
-            @current_uri = uri
-            async.remove_play_ban if user_initiated
-            async.cut_queue if cut_queue
-            player.play(uri)
+            @logger.debug "#{self.class}#play: URI is new URI, playing URI #{uri}"
           end
+          @current_uri = uri
+          async.remove_play_ban if user_initiated
+          async.cut_queue if cut_queue
+          player.play(uri)
         end
       end
 
