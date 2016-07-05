@@ -112,6 +112,10 @@ module Spotifuby
       spotify.who_added_track.to_json
     end
 
+    get '/song_stats.json' do
+      spotify.all_song_stats.to_json
+    end
+
     # Search actions
     %i(search_artist search_album search_track).each do |action|
       get "/#{action}.json" do

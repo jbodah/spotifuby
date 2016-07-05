@@ -4,6 +4,7 @@ require 'spotifuby/spotify/configuration'
 require 'spotifuby/spotify/player'
 require 'spotifuby/spotify/web'
 require 'spotifuby/spotify/async/coordinator'
+require 'spotifuby/spotify/stats'
 require 'spotifuby/util/logger'
 
 module Spotifuby
@@ -21,6 +22,7 @@ module Spotifuby
         @player = Player.new(max_volume: max_volume)
         @async  = Async::Coordinator.new(self)
         @logger = Spotifuby::Util::Logger
+        @stats  = Stats.new
       end
 
       def run!
@@ -50,7 +52,6 @@ module Spotifuby
       def play_default_uri;             play default_uri; end
 
       def player_position;              player.position; end
-      def next;                         player.next_track; end
       def previous;                     player.previous_track; end
       def set_volume(v);                player.volume = v; end
       def track_duration;               player.track_duration; end
@@ -61,6 +62,13 @@ module Spotifuby
 
       def enqueue_uri(uri);             async.enqueue(uri); end
       def dump_queue;                   async.dump_queue; end
+
+      def all_song_stats;               stats.index; end
+
+      def next
+        stats.increment_skip_count(current_track)
+        player.next_track
+      end
 
       %i(artist album track).each do |sym|
         define_method "search_#{sym}" do |q|
@@ -82,7 +90,7 @@ module Spotifuby
 
       private
 
-      attr_reader :player, :async
+      attr_reader :player, :async, :stats
 
       def web
         Web.new(client_id, client_secret)
