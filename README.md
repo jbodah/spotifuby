@@ -1,3 +1,7 @@
+# Project Status
+
+This project is no longer being maintained. The code here is simply for example purposes only. I suggest using Spotify's REST API's over the OSX API's as they have come a long way
+
 # Spotifuby
 
 [![Build Status](https://travis-ci.org/jbodah/spotifuby.svg?branch=master)](https://travis-ci.org/jbodah/spotifuby)
